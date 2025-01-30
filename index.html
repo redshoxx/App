@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KNOXHULT Eckküche, weiß - IKEA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --ikea-blue: #0058aa;
+            --ikea-dark: #111111;
+            --ikea-gray: #e5e5e5;
+            --ikea-green: #4caf50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            font-family: 'Noto Sans', Arial, sans-serif;
+        }
+
+        body {
+            background: white;
+            color: var(--ikea-dark);
+            padding: 20px;
+        }
+
+        .product-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        .product-images {
+            display: flex;
+            flex-direction: column; /* Hauptbild und Miniaturansichten untereinander */
+            gap: 10px;
+        }
+
+        .main-image {
+            width: 500px;
+            height: 500px;
+            object-fit: cover;
+            border: 1px solid var(--ikea-gray);
+        }
+
+        .thumbnail-container {
+            display: flex;
+            flex-direction: row; /* Miniaturansichten nebeneinander */
+            gap: 10px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border: 1px solid var(--ikea-gray);
+            cursor: pointer;
+        }
+
+        .thumbnail.active {
+            border: 2px solid var(--ikea-blue);
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .product-description {
+            font-size: 16px;
+            color: #444;
+            margin-bottom: 24px;
+        }
+
+        .price {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .rating {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .disclaimer {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .store-switcher {
+            color: var(--ikea-blue);
+            text-decoration: none;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 24px;
+        }
+
+        .delivery-options {
+            margin-bottom: 24px;
+        }
+
+        .delivery-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .delivery-icon {
+            font-size: 24px;
+            margin-right: 8px;
+        }
+
+        .delivery-text {
+            font-size: 14px;
+        }
+
+        .unavailable {
+            color: #666;
+        }
+
+        .available {
+            color: var(--ikea-green);
+        }
+
+        .try-in-store {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .add-to-cart-btn {
+            background: var(--ikea-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+
+        /* Modal Style */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-text {
+            font-size: 16px;
+        }
+
+        .modal-input {
+            padding: 8px;
+            margin-top: 10px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .modal-button {
+            background-color: var(--ikea-blue);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .modal-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="product-container">
+        <!-- Produktbilder -->
+        <div class="product-images">
+            <!-- Hauptbild -->
+            <img id="mainImage" src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="KNOXHULT Eckküche" class="main-image">
+            <!-- Miniaturansichten -->
+            <div class="thumbnail-container">
+                <img src="https://s20.directupload.net/images/250130/k8w3rxhj.jpg" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/k8w3rxhj.jpg')">
+                <img src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/lbb9b2zy.jpg')">
+                <img src="https://s20.directupload.net/images/250130/o2k4xwr2.jpg" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/o2k4xwr2.jpg')">
+            </div>
+        </div>
+
+        <!-- Produktdetails -->
+        <div class="product-details">
+            <h1 class="product-title">KNOXHULT</h1>
+            <p class="product-description">Eckküche, weiß, 243×164×220 cm</p>
+            
+            <!-- Preis mit Euro-Symbol -->
+            <div class="price">€ 1.574.-</div>
+            
+            <p class="disclaimer">
+                ① Knöpfe und Griffe sind separat erhältlich. Elektrogeräte separat erhältlich.
+            </p>
+
+            <a href="#" class="store-switcher">So bekommst du es: Einrichtungshaus wechseln</a>
+
+            <div class="delivery-options">
+                <div class="delivery-option">
+                    <!-- Lieferung Icon mit FontAwesome -->
+                    <i class="fas fa-truck delivery-icon"></i>
+                    <div class="delivery-text" id="deliveryText">
+                        Lieferung<br>
+                        <span id="deliveryStatus"></span>
+                    </div>
+                </div>
+
+                <div class="delivery-option">
+                    <!-- Abholung aus dem Internet Icon mit FontAwesome -->
+                    <i class="fas fa-shopping-cart delivery-icon"></i>
+                    <div class="delivery-text" id="storeText">
+                        Selbstabholung<br>
+                        <span class="unavailable">Click & Collect - Nicht verfügbar</span><br>
+                        <span class="available">Einrichtungshaus - Vor Ort bestellbar wenn lieferbar</span>
+                    </div>
+                </div>
+            </div>
+
+            <p class="try-in-store">
+                Probiere dieses oder ähnliche Produkte in den Einrichtungshäusern aus
+            </p>
+
+            <!-- Der Button für die Lieferung Prüfung, der jetzt hier ist -->
+            <button class="add-to-cart-btn" id="checkDelivery">Lieferverfügbarkeit prüfen</button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="deliveryModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p class="modal-text">Dein Standort<br>Erhalte aktuelle Informationen über Lieferungen und Verfügbarkeit für deine Region.</p>
+            <label for="postalCode">Gib eine Postleitzahl ein</label>
+            <input type="text" id="postalCode" class="modal-input" placeholder="z.B. 4001" oninput="validatePostalCode()">
+            <button class="modal-button" id="submitPostalCode" disabled>Speichern</button>
+            <p class="modal-text" style="font-size: 12px; color: #777;">Wir nutzen Cookies um dir diese Funktion anzubieten. Weitere Informationen zur Verwendung von Cookies findest du in unserer Cookie-Richtlinie. Dein Standort wird nicht geteilt.</p>
+        </div>
+    </div>
+
+    <script>
+        // Funktion zum Ändern des Hauptbildes
+        function changeImage(src) {
+            document.getElementById('mainImage').src = src;
+            // Entferne die aktive Klasse von allen Miniaturansichten
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            thumbnails.forEach(thumbnail => thumbnail.classList.remove('active'));
+            // Füge die aktive Klasse zur ausgewählten Miniaturansicht hinzu
+            event.target.classList.add('active');
+        }
+
+        // Modal öffnen bei Klick auf den Button "Lieferverfügbarkeit prüfen"
+        document.getElementById('checkDelivery').onclick = function() {
+            document.getElementById('deliveryModal').style.display = 'block';
+        }
+
+        // Schließen des Modals
+        document.querySelector('.close').onclick = function() {
+            document.getElementById('deliveryModal').style.display = 'none';
+        }
+
+        // Postleitzahl validieren
+        function validatePostalCode() {
+            const postalCodeInput = document.getElementById('postalCode');
+            const submitButton = document.getElementById('submitPostalCode');
+            const postalCode = postalCodeInput.value.trim();
+
+            // Überprüfen, ob die Postleitzahl im Bereich der Steiermark liegt (8000-8993)
+            const isValid = /^8\d{3}$/.test(postalCode);
+            if (isValid) {
+                submitButton.disabled = false;
+            } else {
+                submitButton.disabled = false;
+            }
+        }
+
+        // Funktion, um das Modal zu schließen und Postleitzahl zu bestätigen
+        document.getElementById('submitPostalCode').onclick = function() {
+            const postalCode = document.getElementById('postalCode').value.trim();
+            const deliveryStatus = document.getElementById('deliveryStatus');
+            const deliveryText = document.getElementById('deliveryText');
+
+            // Überprüfen, ob die Postleitzahl im Bereich der Steiermark liegt
+            if (/^8\d{3}$/.test(postalCode)) {
+                // Schließt das Modal
+                document.getElementById('deliveryModal').style.display = 'none';
+
+                // Postleitzahl anzeigen bei Lieferung (Text in schwarz)
+                deliveryText.innerHTML = `Lieferverfügbarkeit<br><span class="available">🟢 Verfügbar <span style="color: black;">(Postleitzahl:${postalCode})</span>`;
+            } else {
+                // Schließt das Modal
+                document.getElementById('deliveryModal').style.display = 'none';
+
+                // Zeige, dass es nicht verfügbar ist (Text in schwarz)
+                deliveryText.innerHTML = `Lieferverfügbarkeit<br><span class="unavailable">🔴 Nicht Verfügbar <span style="color: black;">(Postleitzahl:${postalCode})</span>`;
+            }
+        }
+
+        // Event, um das Modal zu schließen, wenn der Benutzer außerhalb des Modals klickt
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('deliveryModal')) {
+                document.getElementById('deliveryModal').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html> bei mobilgeräten beschreibung unter Minitauransichten anzeigen
