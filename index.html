@@ -30,7 +30,7 @@
             margin: 0 auto;
             display: flex;
             gap: 20px;
-            flex-wrap: wrap; /* Für mehr Flexibilität auf mobilen Geräten */
+            flex-wrap: wrap; /* Flexibles Layout, um auf mobilen Geräten gut zu skalieren */
         }
 
         .product-images {
@@ -275,17 +275,6 @@
 </head>
 <body>
     <div class="product-container">
-        <div class="product-images">
-            <!-- Hauptbild -->
-            <img id="mainImage" src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="KNOXHULT Eckküche" class="main-image">
-            <!-- Miniaturansichten -->
-            <div class="thumbnail-container">
-                <img src="https://s20.directupload.net/images/250130/k8w3rxhj.jpg" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/k8w3rxhj.jpg')">
-                <img src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/lbb9b2zy.jpg')">
-                <img src="https://s20.directupload.net/images/250130/o2k4xwr2.jpg" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/o2k4xwr2.jpg')">
-            </div>
-        </div>
-
         <div class="product-details">
             <h1 class="product-title">KNOXHULT</h1>
             <p class="product-description">Eckküche, weiß, 243×164×220 cm</p>
@@ -319,6 +308,17 @@
             </p>
 
             <button class="add-to-cart-btn" id="checkDelivery">Lieferverfügbarkeit prüfen</button>
+        </div>
+
+        <div class="product-images">
+            <!-- Hauptbild -->
+            <img id="mainImage" src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="KNOXHULT Eckküche" class="main-image">
+            <!-- Miniaturansichten -->
+            <div class="thumbnail-container">
+                <img src="https://s20.directupload.net/images/250130/k8w3rxhj.jpg" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/k8w3rxhj.jpg')">
+                <img src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/lbb9b2zy.jpg')">
+                <img src="https://s20.directupload.net/images/250130/o2k4xwr2.jpg" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/o2k4xwr2.jpg')">
+            </div>
         </div>
     </div>
 
