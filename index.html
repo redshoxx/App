@@ -30,7 +30,7 @@
             margin: 0 auto;
             display: flex;
             gap: 20px;
-            flex-wrap: wrap; /* Flexibles Layout, um auf mobilen Geräten gut zu skalieren */
+            flex-wrap: wrap;
         }
 
         .product-images {
@@ -42,8 +42,8 @@
         }
 
         .main-image {
-            width: 100%; /* Bildgröße passt sich der Breite an */
-            max-width: 500px; /* Maximale Breite für größere Bildschirme */
+            width: 100%;
+            max-width: 500px;
             height: auto;
             object-fit: cover;
             border: 1px solid var(--ikea-gray);
@@ -51,9 +51,9 @@
 
         .thumbnail-container {
             display: flex;
-            flex-direction: row; /* Miniaturansichten nebeneinander */
             gap: 10px;
-            justify-content: center; /* Miniaturen zentrieren */
+            justify-content: center;
+            margin-top: 10px;
         }
 
         .thumbnail {
@@ -78,12 +78,6 @@
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 16px;
-        }
-
-        .product-description {
-            font-size: 16px;
-            color: #444;
-            margin-bottom: 24px;
         }
 
         .price {
@@ -221,17 +215,18 @@
         /* Mobile Anpassungen */
         @media (max-width: 768px) {
             .product-container {
-                flex-direction: column; /* Auf mobilen Geräten vertikal anordnen */
+                flex-direction: column;
                 gap: 20px;
             }
 
             .product-images {
-                width: 100%; /* Bildcontainer auf 100% setzen */
+                width: 100%;
             }
 
             .thumbnail-container {
-                flex-direction: column; /* Miniaturansichten untereinander auf mobilen Geräten */
+                flex-direction: row; /* Miniaturansichten horizontal */
                 gap: 10px;
+                justify-content: center;
             }
 
             .product-details {
@@ -245,15 +240,11 @@
             .delivery-options,
             .try-in-store,
             .add-to-cart-btn {
-                text-align: center; /* Text zentrieren */
+                text-align: center;
             }
 
             .product-title {
-                font-size: 24px; /* Kleinere Schrift auf mobilen Geräten */
-            }
-
-            .product-description {
-                font-size: 14px;
+                font-size: 24px;
             }
 
             .price {
@@ -261,12 +252,11 @@
             }
 
             .main-image {
-                width: 100%; /* Bild anpassen */
-                max-width: none; /* Verhindert feste Breite */
+                width: 100%;
             }
 
             .add-to-cart-btn {
-                font-size: 14px; /* Button Schriftgröße kleiner */
+                font-size: 14px;
                 padding: 10px;
             }
         }
@@ -275,9 +265,19 @@
 </head>
 <body>
     <div class="product-container">
+        <div class="product-images">
+            <!-- Hauptbild -->
+            <img id="mainImage" src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="KNOXHULT Eckküche" class="main-image">
+            <!-- Miniaturansichten -->
+            <div class="thumbnail-container">
+                <img src="https://s20.directupload.net/images/250130/k8w3rxhj.jpg" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/k8w3rxhj.jpg')">
+                <img src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/lbb9b2zy.jpg')">
+                <img src="https://s20.directupload.net/images/250130/o2k4xwr2.jpg" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/o2k4xwr2.jpg')">
+            </div>
+        </div>
+
         <div class="product-details">
             <h1 class="product-title">KNOXHULT</h1>
-            <p class="product-description">Eckküche, weiß, 243×164×220 cm</p>
             <div class="price">€ 1.574.-</div>
             <p class="disclaimer">
                 ① Knöpfe und Griffe sind separat erhältlich. Elektrogeräte separat erhältlich.
@@ -308,17 +308,6 @@
             </p>
 
             <button class="add-to-cart-btn" id="checkDelivery">Lieferverfügbarkeit prüfen</button>
-        </div>
-
-        <div class="product-images">
-            <!-- Hauptbild -->
-            <img id="mainImage" src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="KNOXHULT Eckküche" class="main-image">
-            <!-- Miniaturansichten -->
-            <div class="thumbnail-container">
-                <img src="https://s20.directupload.net/images/250130/k8w3rxhj.jpg" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/k8w3rxhj.jpg')">
-                <img src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/lbb9b2zy.jpg')">
-                <img src="https://s20.directupload.net/images/250130/o2k4xwr2.jpg" alt="Thumbnail 4" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/o2k4xwr2.jpg')">
-            </div>
         </div>
     </div>
 
