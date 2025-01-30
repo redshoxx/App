@@ -210,6 +210,55 @@
             background-color: #ccc;
             cursor: not-allowed;
         }
+
+        /* Mobile Anpassungen */
+        @media (max-width: 768px) {
+            .product-container {
+                flex-direction: column; /* Auf mobilen Geräten vertikal anordnen */
+                gap: 20px;
+            }
+
+            .product-images {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                align-items: center; /* Zentrieren der Bilder */
+            }
+
+            .thumbnail-container {
+                display: flex;
+                flex-direction: column; /* Miniaturansichten untereinander auf mobilen Geräten */
+                gap: 10px;
+                align-items: center; /* Zentrieren der Miniaturansichten */
+            }
+
+            .product-details {
+                flex: unset; /* Verhindert, dass die Produktdetails einen festen Wert erhalten */
+                width: 100%; /* Damit der Container auch auf mobilen Geräten 100% Breite nutzt */
+            }
+
+            .price,
+            .disclaimer,
+            .store-switcher,
+            .delivery-options,
+            .try-in-store,
+            .add-to-cart-btn {
+                text-align: center; /* Text zentrieren */
+            }
+
+            /* Optional: Text bei kleinerer Schriftgröße für kleinere Bildschirme */
+            .product-title {
+                font-size: 24px;
+            }
+
+            .product-description {
+                font-size: 14px;
+            }
+
+            .price {
+                font-size: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -348,4 +397,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
