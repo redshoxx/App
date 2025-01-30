@@ -38,7 +38,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            align-items: center; /* Bilder zentrieren */
+            align-items: center;
         }
 
         .main-image {
@@ -224,7 +224,7 @@
             }
 
             .thumbnail-container {
-                flex-direction: row; /* Miniaturansichten horizontal */
+                flex-direction: row;
                 gap: 10px;
                 justify-content: center;
             }
@@ -259,16 +259,26 @@
                 font-size: 14px;
                 padding: 10px;
             }
-        }
 
+            /* Modal Anpassungen für mobile Geräte */
+            .modal-content {
+                width: 90%;
+            }
+
+            .modal-input {
+                font-size: 14px;
+            }
+
+            .modal-button {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="product-container">
         <div class="product-images">
-            <!-- Hauptbild -->
             <img id="mainImage" src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="KNOXHULT Eckküche" class="main-image">
-            <!-- Miniaturansichten -->
             <div class="thumbnail-container">
                 <img src="https://s20.directupload.net/images/250130/k8w3rxhj.jpg" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/k8w3rxhj.jpg')">
                 <img src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/lbb9b2zy.jpg')">
