@@ -7,7 +7,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
             --primary-color: #2962ff;
@@ -45,6 +45,10 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
+        h1, h2 {
+            margin-bottom: 16px;
+        }
+
         .input-group {
             margin: 12px 0;
             position: relative;
@@ -80,6 +84,15 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: var(--secondary-color);
+        }
+
+        button.danger {
+            background: var(--error);
         }
 
         .scanner-modal {
@@ -154,6 +167,32 @@
             background: var(--surface);
             border-radius: 8px;
             margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 8px;
+            }
+
+            .card {
+                padding: 12px;
+            }
+
+            input {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            button {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .inventory-item {
+                flex-direction: column;
+                gap: 8px;
+            }
         }
     </style>
 </head>
