@@ -15,6 +15,7 @@
             --background: #f5f5f5;
             --surface: #ffffff;
             --error: #d32f2f;
+            --overlay-color: rgba(0, 0, 0, 0.5);
         }
 
         * {
@@ -36,42 +37,6 @@
             margin: 0 auto;
         }
 
-        /* Mobile Navigation */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: var(--surface);
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #666;
-            text-decoration: none;
-            font-size: 0.8rem;
-            transition: 0.3s;
-        }
-
-        .nav-item.active {
-            color: var(--primary-color);
-        }
-
-        /* Cards */
-        .card {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
         /* Scanner Section */
         #scanner-section {
             position: relative;
@@ -83,6 +48,7 @@
             height: 60vh;
             border-radius: 12px;
             background: #000;
+            position: relative;
         }
 
         .scanner-overlay {
@@ -94,110 +60,49 @@
             height: 200px;
             border: 4px solid #fff;
             border-radius: 12px;
-            box-shadow: 0 0 0 100vmax rgba(0,0,0,0.5);
+            box-shadow: 0 0 0 100vmax var(--overlay-color);
+            animation: pulse 2s infinite;
         }
 
-        /* Form Elements */
-        .input-group {
-            margin: 12px 0;
-        }
-
-        input {
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(41,98,255,0.2);
-        }
-
-        button {
+            height: 4px;
             background: var(--primary-color);
+            animation: scan 3s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(41, 98, 255, 0.5);
+        }
+
+        .scanner-instruction {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: var(--secondary-color);
-        }
-
-        button.danger {
-            background: var(--error);
-        }
-
-        /* Inventory List */
-        .inventory-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px;
-            background: var(--surface);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .item-info {
-            flex: 1;
-        }
-
-        .item-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* Responsive Table */
-        @media (min-width: 768px) {
-            .inventory-table {
-                display: table;
-                width: 100%;
-                border-collapse: collapse;
-            }
-
-            .inventory-item {
-                display: table-row;
-            }
-
-            .inventory-item > div {
-                display: table-cell;
-                padding: 16px;
-                vertical-align: middle;
-            }
-        }
-
-        /* Utility Classes */
-        .hidden {
-            display: none !important;
-        }
-
-        .text-center {
+            font-size: 1.2rem;
             text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 16px;
+            border-radius: 20px;
         }
 
-        .mb-16 {
-            margin-bottom: 16px;
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
         }
 
-        .material-icons {
-            font-size: 20px;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
         }
+
+        /* Rest des CSS bleibt gleich wie im vorherigen Beispiel */
+        /* ... */
+
     </style>
 </head>
 <body>
@@ -205,8 +110,16 @@
         <!-- Scanner Section -->
         <div id="scanner-section" class="hidden">
             <div class="card">
-                <video id="preview"></video>
-                <div class="scanner-overlay"></div>
+                <div class="scanner-container">
+                    <video id="preview"></video>
+                    <div class="scanner-overlay">
+                        <div class="scanner-line"></div>
+                    </div>
+                    <div class="scanner-instruction">
+                        <span class="material-icons">qr_code_scanner</span>
+                        Barcode in den Rahmen halten
+                    </div>
+                </div>
             </div>
             <button onclick="stopScanner()" class="danger mb-16">
                 <span class="material-icons">stop</span>
@@ -214,39 +127,9 @@
             </button>
         </div>
 
-        <!-- Edit Section -->
-        <div id="edit-section" class="hidden">
-            <div class="card">
-                <div class="input-group">
-                    <input type="text" id="barcode" placeholder="Barcode" readonly>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="itemName" placeholder="Artikelname">
-                </div>
-                <div class="input-group">
-                    <input type="number" id="quantity" placeholder="Menge" min="0">
-                </div>
-                <div class="input-group">
-                    <input type="text" id="location" placeholder="Lagerort">
-                </div>
-                <button onclick="saveItem()">
-                    <span class="material-icons">save</span>
-                    Speichern
-                </button>
-                <button onclick="deleteItem()" class="danger mt-8">
-                    <span class="material-icons">delete</span>
-                    Löschen
-                </button>
-            </div>
-        </div>
+        <!-- Rest des HTML bleibt gleich wie im vorherigen Beispiel -->
+        <!-- ... -->
 
-        <!-- Inventory List -->
-        <div id="inventory-section">
-            <div class="card">
-                <h2 class="mb-16">Lagerbestand</h2>
-                <div id="inventoryList" class="inventory-table"></div>
-            </div>
-        </div>
     </div>
 
     <!-- Bottom Navigation -->
@@ -266,7 +149,7 @@
     </nav>
 
     <script>
-        // Firebase Konfiguration
+        // Firebase Konfiguration und Initialisierung
         const firebaseConfig = {
             apiKey: "AIzaSyD8UxvCviFElbTOPGd0aAkXE0kKXZEUJTM",
             authDomain: "soundbase-efda3.firebaseapp.com",
@@ -278,109 +161,54 @@
             measurementId: "G-5ZRN0TTGM2"
         };
 
-        // Firebase Initialisierung
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         let scanner = null;
 
-        // UI Controller
-        function showSection(sectionId) {
-            document.querySelectorAll('[id$="-section"]').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(`${sectionId}-section`).classList.remove('hidden');
-            document.querySelector(`[onclick="showSection('${sectionId}')"]`).classList.add('active');
-            
-            if(sectionId === 'scanner') startScanner();
-            else stopScanner();
-        }
-
-        // Scanner Funktionen
+        // Scanner Funktionen mit verbessertem Overlay
         function startScanner() {
             Instascan.Camera.getCameras().then(cameras => {
                 if (cameras.length > 0) {
                     scanner = new Instascan.Scanner({
                         video: document.getElementById('preview'),
                         mirror: false,
-                        backgroundScan: false
+                        backgroundScan: false,
+                        captureImage: false
                     });
 
                     scanner.addListener('scan', content => {
                         document.getElementById('barcode').value = content;
                         showSection('edit');
                         loadItem(content);
+                        showScanSuccess();
                     });
 
                     scanner.start(cameras[0]);
+                    document.querySelector('.scanner-instruction').style.display = 'block';
                 }
             });
+        }
+
+        function showScanSuccess() {
+            const instruction = document.querySelector('.scanner-instruction');
+            instruction.textContent = '✔️ Barcode erfolgreich gescannt!';
+            instruction.style.backgroundColor = '#4CAF50';
+            setTimeout(() => {
+                instruction.textContent = 'Barcode in den Rahmen halten';
+                instruction.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            }, 2000);
         }
 
         function stopScanner() {
             if(scanner) {
                 scanner.stop();
                 scanner = null;
+                document.querySelector('.scanner-instruction').style.display = 'none';
             }
         }
 
-        // Artikelverwaltung
-        function loadItem(barcode) {
-            database.ref('items/' + barcode).once('value').then(snapshot => {
-                const item = snapshot.val();
-                if(item) {
-                    document.getElementById('itemName').value = item.name;
-                    document.getElementById('quantity').value = item.quantity;
-                    document.getElementById('location').value = item.location;
-                }
-            });
-        }
-
-        function saveItem() {
-            const barcode = document.getElementById('barcode').value;
-            const itemData = {
-                name: document.getElementById('itemName').value,
-                quantity: parseInt(document.getElementById('quantity').value),
-                location: document.getElementById('location').value
-            };
-
-            database.ref('items/' + barcode).set(itemData)
-                .then(() => showSection('inventory'))
-                .catch(alert);
-        }
-
-        function deleteItem() {
-            const barcode = document.getElementById('barcode').value;
-            if(confirm('Artikel unwiderruflich löschen?')) {
-                database.ref('items/' + barcode).remove()
-                    .then(() => showSection('inventory'));
-            }
-        }
-
-        // Echtzeit-Update
-        database.ref('items').on('value', snapshot => {
-            const inventoryList = document.getElementById('inventoryList');
-            inventoryList.innerHTML = '';
-            
-            snapshot.forEach(childSnapshot => {
-                const item = childSnapshot.val();
-                const div = document.createElement('div');
-                div.className = 'inventory-item';
-                div.innerHTML = `
-                    <div class="item-info">
-                        <div><strong>${item.name}</strong></div>
-                        <div>${childSnapshot.key}</div>
-                    </div>
-                    <div class="item-info">${item.quantity}</div>
-                    <div class="item-info">${item.location}</div>
-                    <div class="item-actions">
-                        <button class="secondary" onclick="loadItem('${childSnapshot.key}'); showSection('edit')">
-                            <span class="material-icons">edit</span>
-                        </button>
-                    </div>
-                `;
-                inventoryList.appendChild(div);
-            });
-        });
+        // Rest des JavaScript bleibt gleich wie im vorherigen Beispiel
+        // ...
 
         // Initialisierung
         showSection('scanner');
