@@ -3,375 +3,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KNOXHULT Eckküche, weiß - IKEA</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Lagerverwaltung Pro</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --ikea-blue: #0058aa;
-            --ikea-dark: #111111;
-            --ikea-gray: #e5e5e5;
-            --ikea-green: #4caf50;
+            --primary-color: #2962ff;
+            --secondary-color: #448aff;
+            --background: #f5f5f5;
+            --surface: #ffffff;
+            --error: #d32f2f;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
-            font-family: 'Noto Sans', Arial, sans-serif;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
         }
 
         body {
-            background: white;
-            color: var(--ikea-dark);
-            padding: 20px;
+            background: var(--background);
+            color: #333;
+            line-height: 1.6;
         }
 
-        .product-container {
-            max-width: 1200px;
+        .container {
+            padding: 16px;
+            max-width: 1000px;
             margin: 0 auto;
-            display: flex;
-            gap: 40px;
         }
 
-        .product-images {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .main-image {
+        /* Mobile Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
             width: 100%;
-            height: auto;
-            max-height: 600px;
-            object-fit: contain;
-            margin-bottom: 20px;
-        }
-
-        .thumbnail-container {
+            background: var(--surface);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 1000;
         }
 
-        .thumbnail {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border: 1px solid var(--ikea-gray);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .thumbnail:hover {
-            transform: scale(1.05);
-        }
-
-        .thumbnail.active {
-            border: 2px solid var(--ikea-blue);
-        }
-
-        .product-details {
-            flex: 1;
-            max-width: 600px;
-        }
-
-        .product-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .price {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 25px;
-            color: var(--ikea-dark);
-        }
-
-        .disclaimer {
-            font-size: 14px;
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             color: #666;
-            margin-bottom: 24px;
-        }
-
-        .store-switcher {
-            color: var(--ikea-blue);
             text-decoration: none;
-            font-size: 14px;
-            display: block;
-            margin-bottom: 24px;
+            font-size: 0.8rem;
+            transition: 0.3s;
         }
 
-        .delivery-options {
-            margin-bottom: 24px;
+        .nav-item.active {
+            color: var(--primary-color);
         }
 
-        .delivery-option {
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Scanner Section */
+        #scanner-section {
+            position: relative;
+            margin: 16px 0;
+        }
+
+        #preview {
+            width: 100%;
+            height: 60vh;
+            border-radius: 12px;
+            background: #000;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 200px;
+            border: 4px solid #fff;
+            border-radius: 12px;
+            box-shadow: 0 0 0 100vmax rgba(0,0,0,0.5);
+        }
+
+        /* Form Elements */
+        .input-group {
+            margin: 12px 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(41,98,255,0.2);
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
         }
 
-        .delivery-icon {
-            font-size: 24px;
-            color: var(--ikea-blue);
+        button:hover {
+            background: var(--secondary-color);
         }
 
-        .delivery-text {
-            font-size: 14px;
+        button.danger {
+            background: var(--error);
         }
 
-        .unavailable {
-            color: #666;
-        }
-
-        .available {
-            color: var(--ikea-green);
-        }
-
-        .try-in-store {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 24px;
-        }
-
-        .add-to-cart-btn {
-            background: var(--ikea-blue);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 24px;
-            transition: background 0.3s ease;
-        }
-
-        .add-to-cart-btn:hover {
-            background: #004080;
-        }
-
-        /* Modal Style */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            padding-top: 60px;
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
+        /* Inventory List */
+        .inventory-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--surface);
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
+        .item-info {
+            flex: 1;
         }
 
-        .close:hover,
-        .close:focus {
-            color: black;
+        .item-actions {
+            display: flex;
+            gap: 8px;
         }
 
-        .modal-text {
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .modal-input {
-            padding: 8px;
-            margin-top: 10px;
-            font-size: 16px;
-            width: 100%;
-            border: 1px solid var(--ikea-gray);
-            border-radius: 4px;
-        }
-
-        .modal-button {
-            background-color: var(--ikea-blue);
-            color: white;
-            border: none;
-            padding: 12px;
-            font-size: 16px;
-            width: 100%;
-            margin-top: 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-button:hover {
-            opacity: 0.9;
-        }
-
-        .modal-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .product-container {
-                flex-direction: column;
-                gap: 25px;
+        /* Responsive Table */
+        @media (min-width: 768px) {
+            .inventory-table {
+                display: table;
+                width: 100%;
+                border-collapse: collapse;
             }
 
-            .product-title {
-                font-size: 26px;
-                text-align: center;
+            .inventory-item {
+                display: table-row;
             }
 
-            .price {
-                font-size: 22px;
-                text-align: center;
+            .inventory-item > div {
+                display: table-cell;
+                padding: 16px;
+                vertical-align: middle;
             }
+        }
 
-            .thumbnail-container {
-                justify-content: center;
-            }
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
 
-            .thumbnail {
-                width: 60px;
-                height: 60px;
-            }
+        .text-center {
+            text-align: center;
+        }
 
-            .add-to-cart-btn {
-                padding: 15px 20px;
-                font-size: 18px;
-            }
+        .mb-16 {
+            margin-bottom: 16px;
+        }
 
-            .modal-content {
-                width: 90%;
-                margin: 20% auto;
-            }
+        .material-icons {
+            font-size: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="product-container">
-        <!-- Produktbilder -->
-        <div class="product-images">
-            <!-- Hauptbild -->
-            <img id="mainImage" src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="KNOXHULT Eckküche" class="main-image">
-            <!-- Miniaturansichten -->
-            <div class="thumbnail-container">
-                <img src="https://s20.directupload.net/images/250130/k8w3rxhj.jpg" alt="Thumbnail 1" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/k8w3rxhj.jpg')">
-                <img src="https://s20.directupload.net/images/250130/lbb9b2zy.jpg" alt="Thumbnail 2" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/lbb9b2zy.jpg')">
-                <img src="https://s20.directupload.net/images/250130/o2k4xwr2.jpg" alt="Thumbnail 3" class="thumbnail" onclick="changeImage('https://s20.directupload.net/images/250130/o2k4xwr2.jpg')">
+    <div class="container">
+        <!-- Scanner Section -->
+        <div id="scanner-section" class="hidden">
+            <div class="card">
+                <video id="preview"></video>
+                <div class="scanner-overlay"></div>
+            </div>
+            <button onclick="stopScanner()" class="danger mb-16">
+                <span class="material-icons">stop</span>
+                Stop Scanner
+            </button>
+        </div>
+
+        <!-- Edit Section -->
+        <div id="edit-section" class="hidden">
+            <div class="card">
+                <div class="input-group">
+                    <input type="text" id="barcode" placeholder="Barcode" readonly>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="itemName" placeholder="Artikelname">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="quantity" placeholder="Menge" min="0">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="location" placeholder="Lagerort">
+                </div>
+                <button onclick="saveItem()">
+                    <span class="material-icons">save</span>
+                    Speichern
+                </button>
+                <button onclick="deleteItem()" class="danger mt-8">
+                    <span class="material-icons">delete</span>
+                    Löschen
+                </button>
             </div>
         </div>
 
-        <!-- Produktdetails -->
-        <div class="product-details">
-            <h1 class="product-title">KNOXHULT</h1>
-            <div class="price">€ 1.574.-</div>
-            <p class="disclaimer">
-                ① Knöpfe und Griffe sind separat erhältlich. Elektrogeräte separat erhältlich.
-            </p>
-            <a href="#" class="store-switcher">So bekommst du es: Einrichtungshaus wechseln</a>
-
-            <div class="delivery-options">
-                <div class="delivery-option">
-                    <i class="fas fa-truck delivery-icon"></i>
-                    <div class="delivery-text" id="deliveryText">
-                        Lieferung<br>
-                        <span id="deliveryStatus"></span>
-                    </div>
-                </div>
-
-                <div class="delivery-option">
-                    <i class="fas fa-shopping-cart delivery-icon"></i>
-                    <div class="delivery-text" id="storeText">
-                        Selbstabholung<br>
-                        <span class="unavailable">Click & Collect - Nicht verfügbar</span><br>
-                        <span class="available">Einrichtungshaus - Vor Ort bestellbar wenn lieferbar</span>
-                    </div>
-                </div>
+        <!-- Inventory List -->
+        <div id="inventory-section">
+            <div class="card">
+                <h2 class="mb-16">Lagerbestand</h2>
+                <div id="inventoryList" class="inventory-table"></div>
             </div>
-
-            <p class="try-in-store">
-                Probiere dieses oder ähnliche Produkte in den Einrichtungshäusern aus
-            </p>
-
-            <button class="add-to-cart-btn" id="checkDelivery">Lieferverfügbarkeit prüfen</button>
         </div>
     </div>
 
-    <!-- Modal -->
-    <div id="deliveryModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p class="modal-text">Dein Standort<br>Erhalte aktuelle Informationen über Lieferungen und Verfügbarkeit für deine Region.</p>
-            <label for="postalCode">Gib eine Postleitzahl ein</label>
-            <input type="text" id="postalCode" class="modal-input" placeholder="z.B. 4001" oninput="validatePostalCode()">
-            <button class="modal-button" id="submitPostalCode" disabled>Speichern</button>
-            <p class="modal-text" style="font-size: 12px; color: #777;">Wir nutzen Cookies um dir diese Funktion anzubieten. Weitere Informationen zur Verwendung von Cookies findest du in unserer Cookie-Richtlinie. Dein Standort wird nicht geteilt.</p>
-        </div>
-    </div>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a class="nav-item active" onclick="showSection('scanner')">
+            <span class="material-icons">qr_code_scanner</span>
+            Scanner
+        </a>
+        <a class="nav-item" onclick="showSection('inventory')">
+            <span class="material-icons">inventory</span>
+            Bestand
+        </a>
+        <a class="nav-item" onclick="showSection('edit')">
+            <span class="material-icons">edit</span>
+            Bearbeiten
+        </a>
+    </nav>
 
     <script>
-        // Funktion zum Ändern des Hauptbildes
-        function changeImage(src) {
-            document.getElementById('mainImage').src = src;
-            const thumbnails = document.querySelectorAll('.thumbnail');
-            thumbnails.forEach(thumbnail => thumbnail.classList.remove('active'));
-            event.target.classList.add('active');
+        // Firebase Konfiguration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8UxvCviFElbTOPGd0aAkXE0kKXZEUJTM",
+            authDomain: "soundbase-efda3.firebaseapp.com",
+            databaseURL: "https://soundbase-efda3-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "soundbase-efda3",
+            storageBucket: "soundbase-efda3.firebasestorage.app",
+            messagingSenderId: "50414386197",
+            appId: "1:50414386197:web:46de88f7ba50bda4c8221c",
+            measurementId: "G-5ZRN0TTGM2"
+        };
+
+        // Firebase Initialisierung
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        let scanner = null;
+
+        // UI Controller
+        function showSection(sectionId) {
+            document.querySelectorAll('[id$="-section"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`${sectionId}-section`).classList.remove('hidden');
+            document.querySelector(`[onclick="showSection('${sectionId}')"]`).classList.add('active');
+            
+            if(sectionId === 'scanner') startScanner();
+            else stopScanner();
         }
 
-        // Modal öffnen bei Klick auf den Button "Lieferverfügbarkeit prüfen"
-        document.getElementById('checkDelivery').onclick = function() {
-            document.getElementById('deliveryModal').style.display = 'block';
+        // Scanner Funktionen
+        function startScanner() {
+            Instascan.Camera.getCameras().then(cameras => {
+                if (cameras.length > 0) {
+                    scanner = new Instascan.Scanner({
+                        video: document.getElementById('preview'),
+                        mirror: false,
+                        backgroundScan: false
+                    });
+
+                    scanner.addListener('scan', content => {
+                        document.getElementById('barcode').value = content;
+                        showSection('edit');
+                        loadItem(content);
+                    });
+
+                    scanner.start(cameras[0]);
+                }
+            });
         }
 
-        // Schließen des Modals
-        document.querySelector('.close').onclick = function() {
-            document.getElementById('deliveryModal').style.display = 'none';
-        }
-
-        // Postleitzahl validieren
-        function validatePostalCode() {
-            const postalCodeInput = document.getElementById('postalCode');
-            const submitButton = document.getElementById('submitPostalCode');
-            const postalCode = postalCodeInput.value.trim();
-            const isValid = /^8\d{3}$/.test(postalCode);
-            submitButton.disabled = !isValid;
-        }
-
-        // Funktion, um das Modal zu schließen und Postleitzahl zu bestätigen
-        document.getElementById('submitPostalCode').onclick = function() {
-            const postalCode = document.getElementById('postalCode').value.trim();
-            const deliveryStatus = document.getElementById('deliveryStatus');
-            const deliveryText = document.getElementById('deliveryText');
-
-            if (/^8\d{3}$/.test(postalCode)) {
-                document.getElementById('deliveryModal').style.display = 'none';
-                deliveryText.innerHTML = `Lieferverfügbarkeit<br><span class="available">🟢 Verfügbar (Postleitzahl: ${postalCode})</span>`;
-            } else {
-                document.getElementById('deliveryModal').style.display = 'none';
-                deliveryText.innerHTML = `Lieferverfügbarkeit<br><span class="unavailable">🔴 Nicht verfügbar (Postleitzahl: ${postalCode})</span>`;
+        function stopScanner() {
+            if(scanner) {
+                scanner.stop();
+                scanner = null;
             }
         }
 
-        // Event, um das Modal zu schließen, wenn der Benutzer außerhalb des Modals klickt
-        window.onclick = function(event) {
-            if (event.target === document.getElementById('deliveryModal')) {
-                document.getElementById('deliveryModal').style.display = 'none';
+        // Artikelverwaltung
+        function loadItem(barcode) {
+            database.ref('items/' + barcode).once('value').then(snapshot => {
+                const item = snapshot.val();
+                if(item) {
+                    document.getElementById('itemName').value = item.name;
+                    document.getElementById('quantity').value = item.quantity;
+                    document.getElementById('location').value = item.location;
+                }
+            });
+        }
+
+        function saveItem() {
+            const barcode = document.getElementById('barcode').value;
+            const itemData = {
+                name: document.getElementById('itemName').value,
+                quantity: parseInt(document.getElementById('quantity').value),
+                location: document.getElementById('location').value
+            };
+
+            database.ref('items/' + barcode).set(itemData)
+                .then(() => showSection('inventory'))
+                .catch(alert);
+        }
+
+        function deleteItem() {
+            const barcode = document.getElementById('barcode').value;
+            if(confirm('Artikel unwiderruflich löschen?')) {
+                database.ref('items/' + barcode).remove()
+                    .then(() => showSection('inventory'));
             }
         }
+
+        // Echtzeit-Update
+        database.ref('items').on('value', snapshot => {
+            const inventoryList = document.getElementById('inventoryList');
+            inventoryList.innerHTML = '';
+            
+            snapshot.forEach(childSnapshot => {
+                const item = childSnapshot.val();
+                const div = document.createElement('div');
+                div.className = 'inventory-item';
+                div.innerHTML = `
+                    <div class="item-info">
+                        <div><strong>${item.name}</strong></div>
+                        <div>${childSnapshot.key}</div>
+                    </div>
+                    <div class="item-info">${item.quantity}</div>
+                    <div class="item-info">${item.location}</div>
+                    <div class="item-actions">
+                        <button class="secondary" onclick="loadItem('${childSnapshot.key}'); showSection('edit')">
+                            <span class="material-icons">edit</span>
+                        </button>
+                    </div>
+                `;
+                inventoryList.appendChild(div);
+            });
+        });
+
+        // Initialisierung
+        showSection('scanner');
+        window.addEventListener('beforeunload', stopScanner);
     </script>
 </body>
 </html>
