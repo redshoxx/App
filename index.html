@@ -3,359 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lagerverwaltung Pro</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/instascan.min.js"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #2962ff;
-            --secondary-color: #448aff;
-            --background: #f5f5f5;
-            --surface: #ffffff;
-            --error: #d32f2f;
-            --overlay-color: rgba(0, 0, 0, 0.5);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        body {
-            background: var(--background);
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .container {
-            padding: 16px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        h1, h2 {
-            margin-bottom: 16px;
-        }
-
-        .input-group {
-            margin: 12px 0;
-            position: relative;
-        }
-
-        input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        .scan-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary-color);
-            cursor: pointer;
-        }
-
-        button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 8px;
-            font-size: 16px;
-            width: 100%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background: var(--secondary-color);
-        }
-
-        .scanner-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .scanner-modal.active {
-            display: flex;
-        }
-
-        #preview {
-            width: 100%;
-            max-width: 500px;
-            height: 60vh;
-            border-radius: 12px;
-        }
-
-        .scanner-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            height: 200px;
-            border: 4px solid #fff;
-            border-radius: 12px;
-            box-shadow: 0 0 0 100vmax var(--overlay-color);
-        }
-
-        .scanner-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--primary-color);
-            animation: scan 3s ease-in-out infinite;
-        }
-
-        @keyframes scan {
-            0% { top: 0; }
-            50% { top: 100%; }
-            100% { top: 0; }
-        }
-
-        .close-scanner {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-        }
-
-        .inventory-list {
-            margin-top: 20px;
-        }
-
-        .inventory-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 16px;
-            background: var(--surface);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 8px;
-            }
-
-            .card {
-                padding: 12px;
-            }
-
-            input {
-                padding: 12px;
-                font-size: 14px;
-            }
-
-            button {
-                padding: 12px;
-                font-size: 14px;
-            }
-
-            .inventory-item {
-                flex-direction: column;
-                gap: 8px;
-            }
-        }
-    </style>
+    <title>Kühlschrank Inventar</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <h1>📦 Lagerverwaltung</h1>
-            
-            <div class="input-group">
-                <input type="text" id="barcode" placeholder="Barcode" readonly>
-                <span class="material-icons scan-icon" onclick="openScanner()">qr_code_scanner</span>
+        <div class="section" id="kuhlschrank">
+            <div class="section-header">
+                <h2>KÜHLSCHRANK (3 Produkte)</h2>
+                <span class="einkaufe">4 Einkäufe</span>
             </div>
-            
-            <div class="input-group">
-                <input type="text" id="itemName" placeholder="Artikelname">
+            <div class="item-list">
+                <div class="item" data-section="KÜHLSCHRANK" data-name="Avocado">
+                    <div class="item-icon">🥑</div>
+                    <div class="item-content">
+                        <div class="item-name">Avocado</div>
+                        <div class="item-status">Ältestes 2 Tage verbleibend</div>
+                    </div>
+                    <div class="item-count">2 ×</div>
+                    <button class="scan-icon">🔍</button>
+                </div>
+                <div class="item" data-section="KÜHLSCHRANK" data-name="Avocado2">
+                    <div class="item-icon">🥑</div>
+                    <div class="item-content">
+                        <div class="item-name">Avocado</div>
+                        <div class="item-status">Gekauft vor 8 Tagen</div>
+                    </div>
+                    <button class="scan-icon">🔍</button>
+                </div>
+                <div class="item" data-section="KÜHLSCHRANK" data-name="Chilies">
+                    <div class="item-icon">🌶️</div>
+                    <div class="item-content">
+                        <div class="item-name">Chilies</div>
+                        <div class="item-status">14 Tage verbleibend</div>
+                    </div>
+                    <button class="scan-icon">🔍</button>
+                </div>
+                <div class="item" data-section="KÜHLSCHRANK" data-name="Kartoffeln">
+                    <div class="item-icon">🥔</div>
+                    <div class="item-content">
+                        <div class="item-name">Kartoffeln</div>
+                        <div class="item-status">17 Tage verbleibend</div>
+                    </div>
+                    <button class="scan-icon">🔍</button>
+                </div>
             </div>
-            
-            <div class="input-group">
-                <input type="number" id="quantity" placeholder="Menge" min="0">
-            </div>
-            
-            <div class="input-group">
-                <input type="text" id="location" placeholder="Lagerort">
-            </div>
-            
-            <button onclick="saveItem()">
-                <span class="material-icons">save</span>
-                Artikel speichern
-            </button>
         </div>
 
-        <div class="card">
-            <h2>📋 Lagerbestand</h2>
-            <div id="inventoryList" class="inventory-list"></div>
+        <div class="section" id="nullGradZone">
+            <div class="section-header">
+                <h2>NULL-GRAD-ZONE (1 Produkt)</h2>
+                <span class="einkaufe">1 Einkauf</span>
+            </div>
+            <div class="item-list">
+                <div class="item" data-section="NULL-GRAD-ZONE" data-name="Eier">
+                    <div class="item-icon">🥚</div>
+                    <div class="item-content">
+                        <div class="item-name">Eier</div>
+                        <div class="item-status">2 Monate verbleibend</div>
+                    </div>
+                    <button class="scan-icon">🔍</button>
+                </div>
+            </div>
         </div>
 
-        <!-- Scanner Modal -->
-        <div class="scanner-modal">
-            <div class="scanner-container">
-                <video id="preview"></video>
-                <div class="scanner-overlay">
-                    <div class="scanner-line"></div>
+        <div class="section" id="gefrierschrank">
+            <div class="section-header">
+                <h2>GEFRIERSCHRANK (1 Produkt)</h2>
+                <span class="einkaufe">1 Einkauf</span>
+            </div>
+            <div class="item-list">
+                <div class="item" data-section="GEFRIERSCHRANK" data-name="Pizza">
+                    <div class="item-icon">🍕</div>
+                    <div class="item-content">
+                        <div class="item-name">Tiefkühlpizza</div>
+                        <div class="item-status warning">Lege ein Ablaufdatum fest</div>
+                    </div>
+                    <button class="scan-icon">🔍</button>
                 </div>
-                <div class="close-scanner" onclick="closeScanner()">
-                    <span class="material-icons">close</span>
-                </div>
+            </div>
+        </div>
+
+        <div class="section" id="lebensmittelVorrat">
+            <div class="section-header">
+                <h2>LEBENSMITTEL-VORRAT (0 Produkte)</h2>
+                <span class="einkaufe">0 Einkäufe</span>
+            </div>
+            <div class="item-list">
             </div>
         </div>
     </div>
 
-    <script>
-        // Firebase Konfiguration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD8UxvCviFElbTOPGd0aAkXE0kKXZEUJTM",
-            authDomain: "soundbase-efda3.firebaseapp.com",
-            databaseURL: "https://soundbase-efda3-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "soundbase-efda3",
-            storageBucket: "soundbase-efda3.firebasestorage.app",
-            messagingSenderId: "50414386197",
-            appId: "1:50414386197:web:46de88f7ba50bda4c8221c",
-            measurementId: "G-5ZRN0TTGM2"
-        };
+    <!-- Modals -->
+    <div id="scanModal" class="modal">
+        <div class="modal-content">
+            <h3>Produkt scannen</h3>
+            <div class="scan-area">
+                <div class="scan-frame">
+                    <div class="scan-line"></div>
+                </div>
+            </div>
+            <button class="close-button" onclick="closeModal('scanModal')">Abbrechen</button>
+        </div>
+    </div>
 
-        // Firebase Initialisierung
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        let scanner = null;
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <h3>Neues Produkt hinzufügen</h3>
+            <form id="addItemForm">
+                <select name="section" required>
+                    <option value="KÜHLSCHRANK">Kühlschrank</option>
+                    <option value="NULL-GRAD-ZONE">Null-Grad-Zone</option>
+                    <option value="GEFRIERSCHRANK">Gefrierschrank</option>
+                    <option value="LEBENSMITTEL-VORRAT">Lebensmittel-Vorrat</option>
+                </select>
+                <input type="text" name="name" placeholder="Produktname" required>
+                <input type="number" name="expiryDays" placeholder="Haltbarkeit in Tagen">
+                <div class="button-group">
+                    <button type="submit">Hinzufügen</button>
+                    <button type="button" class="close-button" onclick="closeModal('addItemModal')">Abbrechen</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        // Scanner Funktionen
-        function openScanner() {
-            const modal = document.querySelector('.scanner-modal');
-            modal.classList.add('active');
-            startScanner();
-        }
+    <nav class="bottom-nav">
+        <button class="nav-button">
+            <span class="nav-icon">📋</span>
+            <span>Einkaufsliste</span>
+        </button>
+        <button class="nav-button active">
+            <span class="nav-icon">🏠</span>
+            <span>Vorrat</span>
+        </button>
+    </nav>
 
-        function closeScanner() {
-            const modal = document.querySelector('.scanner-modal');
-            modal.classList.remove('active');
-            stopScanner();
-        }
-
-        function startScanner() {
-            Instascan.Camera.getCameras().then(cameras => {
-                if (cameras.length > 0) {
-                    scanner = new Instascan.Scanner({
-                        video: document.getElementById('preview'),
-                        mirror: false
-                    });
-
-                    scanner.addListener('scan', content => {
-                        document.getElementById('barcode').value = content;
-                        closeScanner();
-                        loadItem(content);
-                    });
-
-                    scanner.start(cameras[0]); // Starte die erste verfügbare Kamera
-                } else {
-                    alert('Keine Kamera gefunden! Bitte Zugriff auf die Kamera erlauben.');
-                }
-            }).catch(error => {
-                console.error('Kamera-Fehler:', error);
-                alert('Fehler beim Zugriff auf die Kamera: ' + error.message);
-            });
-        }
-
-        function stopScanner() {
-            if (scanner) {
-                scanner.stop();
-                scanner = null;
-            }
-        }
-
-        // Artikel Funktionen
-        function loadItem(barcode) {
-            database.ref('items/' + barcode).once('value').then(snapshot => {
-                const item = snapshot.val();
-                if (item) {
-                    document.getElementById('itemName').value = item.name;
-                    document.getElementById('quantity').value = item.quantity;
-                    document.getElementById('location').value = item.location;
-                }
-            });
-        }
-
-        function saveItem() {
-            const barcode = document.getElementById('barcode').value;
-            const itemData = {
-                name: document.getElementById('itemName').value,
-                quantity: parseInt(document.getElementById('quantity').value),
-                location: document.getElementById('location').value
-            };
-
-            if (!barcode || !itemData.name || isNaN(itemData.quantity) || !itemData.location) {
-                alert('Bitte alle Felder korrekt ausfüllen!');
-                return;
-            }
-
-            database.ref('items/' + barcode).set(itemData)
-                .then(() => alert('Artikel erfolgreich gespeichert!'))
-                .catch(error => alert('Fehler: ' + error.message));
-        }
-
-        // Echtzeit-Update der Liste
-        database.ref('items').on('value', snapshot => {
-            const inventoryList = document.getElementById('inventoryList');
-            inventoryList.innerHTML = '';
-
-            snapshot.forEach(childSnapshot => {
-                const item = childSnapshot.val();
-                const div = document.createElement('div');
-                div.className = 'inventory-item';
-                div.innerHTML = `
-                    <div>
-                        <strong>${item.name}</strong><br>
-                        <small>${childSnapshot.key}</small>
-                    </div>
-                    <div>
-                        ${item.quantity}x<br>
-                        <small>${item.location}</small>
-                    </div>
-                `;
-                inventoryList.appendChild(div);
-            });
-        });
-
-        // Initialisierung
-        window.addEventListener('beforeunload', stopScanner);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

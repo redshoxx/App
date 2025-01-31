@@ -1,0 +1,243 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px;
+    padding-bottom: 70px;
+}
+
+.section {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.section-header h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.einkaufe {
+    font-size: 14px;
+    color: #666;
+}
+
+.item-list {
+    padding: 8px 0;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    position: relative;
+}
+
+.item-icon {
+    font-size: 24px;
+    margin-right: 16px;
+}
+
+.item-content {
+    flex-grow: 1;
+}
+
+.item-name {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.item-status {
+    font-size: 14px;
+    color: #666;
+}
+
+.item-status.warning {
+    color: #ff6b6b;
+}
+
+.item-count {
+    font-size: 14px;
+    color: #666;
+    margin-right: 16px;
+}
+
+.scan-icon {
+    color: #666;
+    font-size: 20px;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.nav-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: none;
+    padding: 8px;
+    color: #666;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.nav-button.active {
+    color: #007AFF;
+}
+
+.nav-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal h3 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #333;
+}
+
+/* Scan Area Styles */
+.scan-area {
+    aspect-ratio: 1;
+    background: #f5f5f5;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.scan-frame {
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    right: 10%;
+    bottom: 10%;
+    border: 2px solid #007AFF;
+    border-radius: 8px;
+}
+
+.scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #007AFF;
+    animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+
+/* Form Styles */
+#addItemForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#addItemForm select,
+#addItemForm input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+#addItemForm button {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #007AFF;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#addItemForm button.close-button {
+    background: #f5f5f5;
+    color: #333;
+}
+
+/* Status Colors */
+.status-fresh {
+    color: #4CAF50;
+}
+
+.status-warning {
+    color: #FFC107;
+}
+
+.status-expired {
+    color: #FF5722;
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 8px;
+    }
+    
+    .section {
+        border-radius: 8px;
+    }
+}
