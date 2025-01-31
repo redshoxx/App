@@ -37,18 +37,34 @@
             margin: 0 auto;
         }
 
-        /* Scanner Section */
-        #scanner-section {
+        /* Scanner Modal */
+        .scanner-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .scanner-modal.active {
+            display: flex;
+        }
+
+        .scanner-container {
             position: relative;
-            margin: 16px 0;
+            width: 90%;
+            max-width: 500px;
         }
 
         #preview {
             width: 100%;
             height: 60vh;
             border-radius: 12px;
-            background: #000;
-            position: relative;
         }
 
         .scanner-overlay {
@@ -56,7 +72,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 70%;
+            width: 80%;
             height: 200px;
             border: 4px solid #fff;
             border-radius: 12px;
@@ -88,6 +104,15 @@
             border-radius: 20px;
         }
 
+        .close-scanner {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
         @keyframes scan {
             0% { top: 0; }
             50% { top: 100%; }
@@ -100,6 +125,21 @@
             100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
         }
 
+        /* Form Elements */
+        .input-group {
+            margin: 12px 0;
+            position: relative;
+        }
+
+        .scan-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
         /* Rest des CSS bleibt gleich wie im vorherigen Beispiel */
         /* ... */
 
@@ -107,49 +147,49 @@
 </head>
 <body>
     <div class="container">
-        <!-- Scanner Section -->
-        <div id="scanner-section" class="hidden">
+        <!-- Edit Section -->
+        <div id="edit-section">
             <div class="card">
-                <div class="scanner-container">
-                    <video id="preview"></video>
-                    <div class="scanner-overlay">
-                        <div class="scanner-line"></div>
-                    </div>
-                    <div class="scanner-instruction">
-                        <span class="material-icons">qr_code_scanner</span>
-                        Barcode in den Rahmen halten
-                    </div>
+                <div class="input-group">
+                    <input type="text" id="barcode" placeholder="Barcode" readonly>
+                    <span class="material-icons scan-icon" onclick="openScanner()">qr_code_scanner</span>
                 </div>
+                <div class="input-group">
+                    <input type="text" id="itemName" placeholder="Artikelname">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="quantity" placeholder="Menge" min="0">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="location" placeholder="Lagerort">
+                </div>
+                <button onclick="saveItem()">
+                    <span class="material-icons">save</span>
+                    Speichern
+                </button>
             </div>
-            <button onclick="stopScanner()" class="danger mb-16">
-                <span class="material-icons">stop</span>
-                Stop Scanner
-            </button>
         </div>
 
-        <!-- Rest des HTML bleibt gleich wie im vorherigen Beispiel -->
-        <!-- ... -->
-
+        <!-- Scanner Modal -->
+        <div class="scanner-modal">
+            <div class="scanner-container">
+                <video id="preview"></video>
+                <div class="scanner-overlay">
+                    <div class="scanner-line"></div>
+                </div>
+                <div class="scanner-instruction">
+                    <span class="material-icons">qr_code_scanner</span>
+                    Barcode in den Rahmen halten
+                </div>
+                <div class="close-scanner" onclick="closeScanner()">
+                    <span class="material-icons">close</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <a class="nav-item active" onclick="showSection('scanner')">
-            <span class="material-icons">qr_code_scanner</span>
-            Scanner
-        </a>
-        <a class="nav-item" onclick="showSection('inventory')">
-            <span class="material-icons">inventory</span>
-            Bestand
-        </a>
-        <a class="nav-item" onclick="showSection('edit')">
-            <span class="material-icons">edit</span>
-            Bearbeiten
-        </a>
-    </nav>
-
     <script>
-        // Firebase Konfiguration und Initialisierung
+        // Firebase Konfiguration
         const firebaseConfig = {
             apiKey: "AIzaSyD8UxvCviFElbTOPGd0aAkXE0kKXZEUJTM",
             authDomain: "soundbase-efda3.firebaseapp.com",
@@ -161,57 +201,87 @@
             measurementId: "G-5ZRN0TTGM2"
         };
 
+        // Firebase Initialisierung
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         let scanner = null;
 
-        // Scanner Funktionen mit verbessertem Overlay
+        // Scanner Funktionen
+        function openScanner() {
+            const modal = document.querySelector('.scanner-modal');
+            modal.classList.add('active');
+            startScanner();
+        }
+
+        function closeScanner() {
+            const modal = document.querySelector('.scanner-modal');
+            modal.classList.remove('active');
+            stopScanner();
+        }
+
         function startScanner() {
             Instascan.Camera.getCameras().then(cameras => {
                 if (cameras.length > 0) {
                     scanner = new Instascan.Scanner({
                         video: document.getElementById('preview'),
                         mirror: false,
-                        backgroundScan: false,
-                        captureImage: false
+                        backgroundScan: false
                     });
 
                     scanner.addListener('scan', content => {
                         document.getElementById('barcode').value = content;
-                        showSection('edit');
+                        closeScanner();
                         loadItem(content);
-                        showScanSuccess();
                     });
 
                     scanner.start(cameras[0]);
-                    document.querySelector('.scanner-instruction').style.display = 'block';
+                } else {
+                    alert('Keine Kamera gefunden!');
                 }
+            }).catch(error => {
+                console.error('Kamera-Fehler:', error);
+                alert('Kamera konnte nicht gestartet werden!');
             });
-        }
-
-        function showScanSuccess() {
-            const instruction = document.querySelector('.scanner-instruction');
-            instruction.textContent = '✔️ Barcode erfolgreich gescannt!';
-            instruction.style.backgroundColor = '#4CAF50';
-            setTimeout(() => {
-                instruction.textContent = 'Barcode in den Rahmen halten';
-                instruction.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-            }, 2000);
         }
 
         function stopScanner() {
             if(scanner) {
                 scanner.stop();
                 scanner = null;
-                document.querySelector('.scanner-instruction').style.display = 'none';
             }
         }
 
-        // Rest des JavaScript bleibt gleich wie im vorherigen Beispiel
-        // ...
+        // Artikel Funktionen
+        function loadItem(barcode) {
+            database.ref('items/' + barcode).once('value').then(snapshot => {
+                const item = snapshot.val();
+                if(item) {
+                    document.getElementById('itemName').value = item.name;
+                    document.getElementById('quantity').value = item.quantity;
+                    document.getElementById('location').value = item.location;
+                }
+            });
+        }
+
+        function saveItem() {
+            const barcode = document.getElementById('barcode').value;
+            const itemData = {
+                name: document.getElementById('itemName').value,
+                quantity: parseInt(document.getElementById('quantity').value),
+                location: document.getElementById('location').value
+            };
+
+            if(!barcode || !itemData.name || !itemData.quantity || !itemData.location) {
+                alert('Bitte alle Felder ausfüllen!');
+                return;
+            }
+
+            database.ref('items/' + barcode).set(itemData)
+                .then(() => alert('Artikel erfolgreich gespeichert!'))
+                .catch(error => alert('Fehler beim Speichern: ' + error.message));
+        }
 
         // Initialisierung
-        showSection('scanner');
         window.addEventListener('beforeunload', stopScanner);
     </script>
 </body>
