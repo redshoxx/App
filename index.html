@@ -91,10 +91,6 @@
             background: var(--secondary-color);
         }
 
-        button.danger {
-            background: var(--error);
-        }
-
         .scanner-modal {
             display: none;
             position: fixed;
@@ -263,12 +259,14 @@
 
         // Scanner Funktionen
         function openScanner() {
-            document.querySelector('.scanner-modal').classList.add('active');
+            const modal = document.querySelector('.scanner-modal');
+            modal.classList.add('active');
             startScanner();
         }
 
         function closeScanner() {
-            document.querySelector('.scanner-modal').classList.remove('active');
+            const modal = document.querySelector('.scanner-modal');
+            modal.classList.remove('active');
             stopScanner();
         }
 
@@ -286,15 +284,18 @@
                         loadItem(content);
                     });
 
-                    scanner.start(cameras[0]);
+                    scanner.start(cameras[0]); // Starte die erste verfügbare Kamera
                 } else {
-                    alert('Keine Kamera gefunden!');
+                    alert('Keine Kamera gefunden! Bitte Zugriff auf die Kamera erlauben.');
                 }
+            }).catch(error => {
+                console.error('Kamera-Fehler:', error);
+                alert('Fehler beim Zugriff auf die Kamera: ' + error.message);
             });
         }
 
         function stopScanner() {
-            if(scanner) {
+            if (scanner) {
                 scanner.stop();
                 scanner = null;
             }
@@ -304,7 +305,7 @@
         function loadItem(barcode) {
             database.ref('items/' + barcode).once('value').then(snapshot => {
                 const item = snapshot.val();
-                if(item) {
+                if (item) {
                     document.getElementById('itemName').value = item.name;
                     document.getElementById('quantity').value = item.quantity;
                     document.getElementById('location').value = item.location;
@@ -320,7 +321,7 @@
                 location: document.getElementById('location').value
             };
 
-            if(!barcode || !itemData.name || isNaN(itemData.quantity) || !itemData.location) {
+            if (!barcode || !itemData.name || isNaN(itemData.quantity) || !itemData.location) {
                 alert('Bitte alle Felder korrekt ausfüllen!');
                 return;
             }
