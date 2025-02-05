@@ -2,142 +2,155 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kühlschrank Inventar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🛍️Einkaufsliste</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
 </head>
 <body>
+    <h1 style="color: var(--text-primary); margin: 1rem 0; text-align: center;">🛍️ Einkaufsliste</h1>
+    <div class="budget-wrapper">
+        <button class="budget-toggle">
+            <span class="toggle-icon">▼</span>
+            Budget Details
+        </button>
+        <div class="budget-display">
+            <div class="budget-info">
+                <span>
+                    <div>Budget</div>
+                    <input type="number" 
+                           class="budget-edit" 
+                           id="budgetAmount" 
+                           value="0.00"
+                           step="0.01"
+                           onclick="this.select()"
+                           onblur="updateBudget(this.value)"
+                           onkeypress="if(event.key === 'Enter') this.blur()">
+                </span>
+                <span>
+                    <div>Gesamt</div>
+                    <div id="totalAmount">0.00</div>
+                </span>
+                <span>
+                    <div>Verbleibend</div>
+                    <div id="remainingAmount">0.00</div>
+                </span>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
-        <div class="section" id="kuhlschrank">
-            <div class="section-header">
-                <h2>KÜHLSCHRANK (3 Produkte)</h2>
-                <span class="einkaufe">4 Einkäufe</span>
-            </div>
-            <div class="item-list">
-                <div class="item" data-section="KÜHLSCHRANK" data-name="Avocado">
-                    <div class="item-icon">🥑</div>
-                    <div class="item-content">
-                        <div class="item-name">Avocado</div>
-                        <div class="item-status">Ältestes 2 Tage verbleibend</div>
-                    </div>
-                    <div class="item-count">2 ×</div>
-                    <button class="scan-icon">🔍</button>
-                </div>
-                <div class="item" data-section="KÜHLSCHRANK" data-name="Avocado2">
-                    <div class="item-icon">🥑</div>
-                    <div class="item-content">
-                        <div class="item-name">Avocado</div>
-                        <div class="item-status">Gekauft vor 8 Tagen</div>
-                    </div>
-                    <button class="scan-icon">🔍</button>
-                </div>
-                <div class="item" data-section="KÜHLSCHRANK" data-name="Chilies">
-                    <div class="item-icon">🌶️</div>
-                    <div class="item-content">
-                        <div class="item-name">Chilies</div>
-                        <div class="item-status">14 Tage verbleibend</div>
-                    </div>
-                    <button class="scan-icon">🔍</button>
-                </div>
-                <div class="item" data-section="KÜHLSCHRANK" data-name="Kartoffeln">
-                    <div class="item-icon">🥔</div>
-                    <div class="item-content">
-                        <div class="item-name">Kartoffeln</div>
-                        <div class="item-status">17 Tage verbleibend</div>
-                    </div>
-                    <button class="scan-icon">🔍</button>
-                </div>
+        <div id="shoppingListPage" class="page active">
+            <input type="text" 
+                   class="input-field"
+                   id="productInput"
+                   placeholder="Produkt hinzufügen (z.B. 3x Äpfel 2.50)"
+                   autocomplete="off"
+                   enterkeyhint="done">
+            <div id="errorMessage" class="error-message"></div>
+            
+            <h3 class="list-section">Produkte</h3>
+            <div id="activeList"></div>
+            
+            <div style="padding: 2rem 0 4rem 0;">
+                <h3 class="list-section" data-type="completed">Im Einkaufswagen</h3>
+                <div id="completedList"></div>
             </div>
         </div>
 
-        <div class="section" id="nullGradZone">
-            <div class="section-header">
-                <h2>NULL-GRAD-ZONE (1 Produkt)</h2>
-                <span class="einkaufe">1 Einkauf</span>
-            </div>
-            <div class="item-list">
-                <div class="item" data-section="NULL-GRAD-ZONE" data-name="Eier">
-                    <div class="item-icon">🥚</div>
-                    <div class="item-content">
-                        <div class="item-name">Eier</div>
-                        <div class="item-status">2 Monate verbleibend</div>
-                    </div>
-                    <button class="scan-icon">🔍</button>
+        <div id="inventoryPage" class="page">
+            <h3 class="list-section">📦 Vorratsverwaltung</h3>
+            <button class="toggle-form-button" onclick="toggleInventoryForm()">
+                ➕ Neuer Artikel
+            </button>
+            <div class="inventory-form collapsed">
+                <div class="form-group">
+                    <label for="inventoryInput">Artikel</label>
+                    <input type="text" 
+                           id="inventoryInput"
+                           class="input-field"
+                           placeholder="z.B. Milch"
+                           autocomplete="off"
+                           enterkeyhint="next">
                 </div>
-            </div>
-        </div>
-
-        <div class="section" id="gefrierschrank">
-            <div class="section-header">
-                <h2>GEFRIERSCHRANK (1 Produkt)</h2>
-                <span class="einkaufe">1 Einkauf</span>
-            </div>
-            <div class="item-list">
-                <div class="item" data-section="GEFRIERSCHRANK" data-name="Pizza">
-                    <div class="item-icon">🍕</div>
-                    <div class="item-content">
-                        <div class="item-name">Tiefkühlpizza</div>
-                        <div class="item-status warning">Lege ein Ablaufdatum fest</div>
+                
+                <div class="form-row-group">
+                    <div class="form-group half">
+                        <label for="itemQuantity">Menge</label>
+                        <input type="number" 
+                               id="itemQuantity" 
+                               class="input-field" 
+                               placeholder="1"
+                               min="0" 
+                               step="0.1">
                     </div>
-                    <button class="scan-icon">🔍</button>
+                    <div class="form-group half">
+                        <label for="itemUnit">Einheit</label>
+                        <select id="itemUnit" class="input-field">
+                            <option value="stk">Stück</option>
+                            <option value="g">Gramm</option>
+                            <option value="kg">Kilogramm</option>
+                            <option value="ml">Milliliter</option>
+                            <option value="l">Liter</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="section" id="lebensmittelVorrat">
-            <div class="section-header">
-                <h2>LEBENSMITTEL-VORRAT (0 Produkte)</h2>
-                <span class="einkaufe">0 Einkäufe</span>
+                <div class="form-row-group">
+                    <div class="form-group half">
+                        <label for="itemMhd">MHD</label>
+                        <input type="date" 
+                               id="itemMhd" 
+                               class="input-field">
+                    </div>
+                    <div class="form-group half">
+                        <label for="itemLocation">Lagerort</label>
+                        <input type="text" 
+                               id="itemLocation" 
+                               class="input-field"
+                               placeholder="z.B. Kühlschrank">
+                    </div>
+                </div>
+
+                <button onclick="addInventoryItem()" class="add-button">Hinzufügen</button>
             </div>
-            <div class="item-list">
-            </div>
+
+            <div id="inventoryList" class="inventory-list"></div>
         </div>
     </div>
 
-    <!-- Modals -->
-    <div id="scanModal" class="modal">
-        <div class="modal-content">
-            <h3>Produkt scannen</h3>
-            <div class="scan-area">
-                <div class="scan-frame">
-                    <div class="scan-line"></div>
-                </div>
-            </div>
-            <button class="close-button" onclick="closeModal('scanModal')">Abbrechen</button>
-        </div>
-    </div>
-
-    <div id="addItemModal" class="modal">
-        <div class="modal-content">
-            <h3>Neues Produkt hinzufügen</h3>
-            <form id="addItemForm">
-                <select name="section" required>
-                    <option value="KÜHLSCHRANK">Kühlschrank</option>
-                    <option value="NULL-GRAD-ZONE">Null-Grad-Zone</option>
-                    <option value="GEFRIERSCHRANK">Gefrierschrank</option>
-                    <option value="LEBENSMITTEL-VORRAT">Lebensmittel-Vorrat</option>
-                </select>
-                <input type="text" name="name" placeholder="Produktname" required>
-                <input type="number" name="expiryDays" placeholder="Haltbarkeit in Tagen">
-                <div class="button-group">
-                    <button type="submit">Hinzufügen</button>
-                    <button type="button" class="close-button" onclick="closeModal('addItemModal')">Abbrechen</button>
-                </div>
-            </form>
-        </div>
+    <div id="pricePopup" class="price-popup">
+        <h3>Preis eingeben</h3>
+        <input type="number" class="popup-input" id="priceInput" placeholder="Preis in €" step="0.01" min="0">
+        <button class="popup-button" onclick="submitPrice()">Speichern</button>
     </div>
 
     <nav class="bottom-nav">
-        <button class="nav-button">
-            <span class="nav-icon">📋</span>
-            <span>Einkaufsliste</span>
-        </button>
-        <button class="nav-button active">
-            <span class="nav-icon">🏠</span>
-            <span>Vorrat</span>
-        </button>
+        <div class="nav-item active" onclick="switchPage('shoppingListPage', this)">
+            <span class="nav-icon">🛍️</span>
+            <span class="nav-text">Einkaufsliste</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('inventoryPage', this)">
+            <span class="nav-icon">📦</span>
+            <span class="nav-text">Vorräte</span>
+        </div>
     </nav>
 
     <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('Service Worker registered:', registration);
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        }
+    </script>
 </body>
 </html>

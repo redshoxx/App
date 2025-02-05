@@ -1,243 +1,2394 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+:root {
+    --primary: #252525;
+    --surface: #FFFFFF;
+    --success: #252525;
+    --error: #d80101;
+    --green: #4CAF50;
+    --red: #f44336;
+    --button-accent: #2196F3;
+    --text-primary: #000;
+    --background-secondary: #f8f9ff;
+    --background-primary: #ffffff;
+    --border-color: rgba(0,0,0,0.06);
+    --text-secondary: #666;
+    --accent-hover: #1976d2;
 }
 
 body {
-    background-color: #f5f5f5;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background-color: #f8f9ff;
+    color: var(--text-primary);
+    touch-action: pan-y;
 }
 
 .container {
-    max-width: 600px;
+    width: 100%;
+    max-width: 390px;
     margin: 0 auto;
-    padding: 16px;
-    padding-bottom: 70px;
+    padding: 0 20px;
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+    box-sizing: border-box;
 }
 
-.section {
-    background: white;
+.input-field {
+    width: calc(95% - 2rem);
+    max-width: 298px;
+    margin: 0 auto 0.5rem;
+    display: block;
+    padding: 1rem;
+    border: none;
     border-radius: 12px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: var(--surface);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    font-size: 16px;
+    transition: all 0.2s ease;
 }
 
-.section-header {
+.input-field:focus {
+    outline: none;
+    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
+    transform: scale(1.02);
+}
+
+.error-message {
+    color: var(--error);
+    padding: 0 1rem;
+    margin: 0 auto 1.5rem;
+    max-width: 500px;
+    width: calc(100% - 2rem);
+    display: none;
+    font-size: 0.9em;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.input-field.error {
+    box-shadow: 0 0 0 2px var(--error);
+}
+
+.list-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 16px;
-    border-bottom: 1px solid #eee;
-}
-
-.section-header h2 {
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-}
-
-.einkaufe {
-    font-size: 14px;
-    color: #666;
-}
-
-.item-list {
-    padding: 8px 0;
-}
-
-.item {
-    display: flex;
-    align-items: center;
-    padding: 12px 16px;
+    background: var(--surface);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     position: relative;
+    padding: 12px;
+    margin: 6px 0;
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    touch-action: pan-y pinch-zoom;
+    user-select: none;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.item-icon {
-    font-size: 24px;
-    margin-right: 16px;
+.list-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.list-item:active {
+    transform: scale(0.98);
 }
 
 .item-content {
-    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
-.item-name {
-    font-size: 16px;
-    color: #333;
-    margin-bottom: 4px;
+.item-details {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
 }
 
-.item-status {
-    font-size: 14px;
-    color: #666;
+.quantity-display {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.045);
+    color: var(--text-primary);
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
 }
 
-.item-status.warning {
-    color: #ff6b6b;
+.product-name {
+    flex: 1;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px 0;
+    min-width: 0;
 }
 
-.item-count {
-    font-size: 14px;
-    color: #666;
-    margin-right: 16px;
+.product-price {
+    margin-left: auto;
+    font-weight: 500;
+    color: var(--text-primary);
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.045);
+    font-size: 0.9rem;
+    white-space: nowrap;
 }
 
-.scan-icon {
-    color: #666;
-    font-size: 20px;
+.product-price:hover {
+    background: rgba(0,0,0,0.08);
 }
 
+.delete-icon {
+    color: var(--error);
+    padding: 8px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.delete-icon:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.price-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    display: none;
+    max-width: 300px;
+    width: 100%;
+}
+
+.popup-input {
+    width: calc(100% - 2rem);
+    padding: 0.5rem;
+    margin: 1rem 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.popup-button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.budget-display {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    margin: 15px;
+    padding: 15px;
+    box-shadow: 
+        0 8px 32px rgba(31, 38, 135, 0.1),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.budget-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    text-align: center;
+}
+
+.budget-info span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.budget-info span:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.budget-info span > * {
+    margin: 4px 0;
+}
+
+.budget-edit {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    font-weight: 600;
+    width: 100px;
+    text-align: center;
+    padding: 4px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: linear-gradient(90deg, #6c5ce7, #c026d3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.budget-edit:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    color: #000;
+}
+
+#totalAmount, #remainingAmount, .budget-edit {
+    font-size: 1.2em;
+    font-weight: 600;
+    background: linear-gradient(90deg, #6c5ce7, #c026d3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* Warning state for remaining amount */
+#remainingAmount.negative {
+    background: linear-gradient(90deg, #ff6b6b, #ee5253);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* Success state */
+#remainingAmount.positive {
+    background: linear-gradient(90deg, #20bf6b, #0fb9b1);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 480px) {
+    .budget-display {
+        margin: 10px;
+        padding: 10px;
+    }
+
+    .budget-info {
+        gap: 8px;
+    }
+
+    .budget-info span {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+
+    .budget-edit, #totalAmount, #remainingAmount {
+        font-size: 1.1em;
+    }
+}
+
+/* Animation for updates */
+@keyframes budgetUpdate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.budget-updated {
+    animation: budgetUpdate 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.budget-info-message {
+    background: var(--error);
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    animation: slideDown 0.3s ease;
+}
+
+.budget-warning {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.budget-suggestion {
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.price-edit-popup {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: var(--surface);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px;
+    z-index: 10;
+    animation: fadeIn 0.2s ease;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.price-edit-popup button {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.06);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.price-edit-popup button:hover {
+    background: rgba(0,0,0,0.1);
+}
+
+.price-edit-popup input {
+    width: 80px;
+    text-align: center;
+    padding: 8px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.price-edit-popup input:focus {
+    border-color: var(--primary);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+button {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+}
+
+input, textarea {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #000000;
+}
+
+/* Bottom Navigation */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    background: white;
+    background: var(--surface);
     display: flex;
     justify-content: space-around;
-    padding: 8px 0;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    align-items: center;
+    padding: 10px 0;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
 }
 
-.nav-button {
+.nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: none;
-    border: none;
-    padding: 8px;
-    color: #666;
-    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: background-color 0.2s;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
 }
 
-.nav-button.active {
-    color: #007AFF;
+.nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--button-accent);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-item.active::after {
+    width: 70%;
+}
+
+.nav-item:active {
+    transform: scale(0.95);
 }
 
 .nav-icon {
-    font-size: 24px;
+    font-size: 1.5em;
     margin-bottom: 4px;
+    transition: transform 0.2s ease;
 }
 
-/* Modal Styles */
-.modal {
+.nav-item:active .nav-icon {
+    transform: scale(1.1);
+}
+
+.nav-text {
+    font-size: 0.8em;
+}
+
+/* Page Switching */
+.page {
     display: none;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.page.active {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.page.exit {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+/* Particle Effect */
+.particle {
     position: fixed;
+    pointer-events: none;
+    opacity: 0;
+    border-radius: 50%;
+    background: var(--button-accent);
+    animation: particle 1s cubic-bezier(0, .9, .57, 1) forwards;
+}
+
+@keyframes particle {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Gradient Background Animation */
+.gradient-bg {
+    background: linear-gradient(
+        45deg,
+        #12c2e9,
+        #c471ed,
+        #f64f59
+    );
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Neon Glow Effect */
+.neon-glow {
+    text-shadow: 
+        0 0 5px rgba(33, 150, 243, 0.5),
+        0 0 10px rgba(33, 150, 243, 0.3),
+        0 0 15px rgba(33, 150, 243, 0.2);
+    animation: neon 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes neon {
+    from {
+        text-shadow: 
+            0 0 5px rgba(33, 150, 243, 0.5),
+            0 0 10px rgba(33, 150, 243, 0.3),
+            0 0 15px rgba(33, 150, 243, 0.2);
+    }
+    to {
+        text-shadow: 
+            0 0 10px rgba(33, 150, 243, 0.6),
+            0 0 20px rgba(33, 150, 243, 0.4),
+            0 0 30px rgba(33, 150, 243, 0.3);
+    }
+}
+
+/* Liquid Button Effect */
+.liquid-button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.liquid-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 40%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: liquid 3s infinite;
+}
+
+@keyframes liquid {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Floating Labels */
+.float-label {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.float-label input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-bottom: 2px solid #ddd;
+    background: transparent;
+    transition: all 0.3s;
+}
+
+.float-label label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    pointer-events: none;
+    transition: all 0.3s;
+}
+
+.float-label input:focus + label,
+.float-label input:not(:placeholder-shown) + label {
+    transform: translateY(-20px) scale(0.8);
+    color: var(--button-accent);
+}
+
+/* Shiny Effect */
+.shiny {
+    position: relative;
+    overflow: hidden;
+}
+
+.shiny::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* Morphing Background */
+.morph-bg {
+    background: linear-gradient(45deg, #12c2e9, #c471ed, #f64f59);
+    background-size: 300% 300%;
+    animation: morphing 15s ease-in-out infinite;
+}
+
+@keyframes morphing {
+    0% {
+        background-position: 0% 50%;
+        border-radius: 60% 40% 30% 70%/60% 30% 70% 40%;
+    }
+    50% {
+        background-position: 100% 50%;
+        border-radius: 30% 60% 70% 40%/50% 60% 30% 60%;
+    }
+    100% {
+        background-position: 0% 50%;
+        border-radius: 60% 40% 30% 70%/60% 30% 70% 40%;
+    }
+}
+
+/* Glass Effect */
+.glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+}
+
+/* Typewriter Effect */
+.typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 3.5s steps(40, end);
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+/* Floating Icons */
+.floating-icon {
+    animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+/* Dynamic Border */
+.dynamic-border {
+    position: relative;
+}
+
+.dynamic-border::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--button-accent), transparent);
+    animation: border-flow 2s linear infinite;
+}
+
+@keyframes border-flow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Budget overflow product effect */
+.list-item.budget-overflow {
+    position: relative;
+    overflow: hidden;
+    animation: softPulse 2s infinite;
+}
+
+.list-item.budget-overflow::before {
+    content: '';
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    border: 2px solid transparent;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ff6b6b, #ee5253, #ff6b6b) border-box;
+    -webkit-mask:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(#fff 0 0);
+    mask:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    animation: borderRotate 3s linear infinite;
+}
+
+.list-item.budget-overflow::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    background: linear-gradient(90deg, 
+        rgba(255, 107, 107, 0.1), 
+        rgba(238, 82, 83, 0.1), 
+        rgba(255, 107, 107, 0.1)
+    );
+    filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.list-item.budget-overflow:hover::after {
+    opacity: 1;
+}
+
+.list-item.budget-overflow .product-price {
+    background: linear-gradient(90deg, #ff6b6b, #ee5253);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+}
+
+@keyframes softPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0);
+    }
+}
+
+@keyframes borderRotate {
+    from {
+        background-position: 0% center;
+    }
+    to {
+        background-position: 200% center;
+    }
+}
+
+/* Suggested remove item effect */
+.list-item.suggested-remove {
+    position: relative;
+    animation: removeGlow 2s infinite;
+    border: 2px solid transparent;
+    background: 
+        linear-gradient(var(--surface), var(--surface)) padding-box,
+        linear-gradient(90deg, #ff6b6b, #ee5253) border-box;
+}
+
+.list-item.suggested-remove::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid transparent;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ff6b6b, #ee5253, #ff6b6b) border-box;
+    -webkit-mask:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(#fff 0 0);
+    mask:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    animation: borderRotate 3s linear infinite;
+}
+
+.list-item.suggested-remove::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    background: linear-gradient(90deg, 
+        rgba(255, 107, 107, 0.1), 
+        rgba(238, 82, 83, 0.1), 
+        rgba(255, 107, 107, 0.1)
+    );
+    filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.list-item.suggested-remove:hover::after {
+    opacity: 1;
+}
+
+.list-item.suggested-remove .product-price {
+    background: linear-gradient(90deg, #ff6b6b, #ee5253);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+}
+
+@keyframes removeGlow {
+    0% {
+        box-shadow: 0 0 10px rgba(255, 107, 107, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(255, 107, 107, 0.2);
+    }
+}
+
+/* Make the effect more subtle on mobile */
+@media (max-width: 480px) {
+    .list-item.suggested-remove {
+        animation: removeGlow 3s infinite;
+    }
+
+    .list-item.suggested-remove::before {
+        opacity: 0.15;
+    }
+
+    .list-item.suggested-remove:hover::before {
+        opacity: 0.3;
+    }
+}
+
+/* Budget Toggle Button */
+.budget-wrapper {
+    margin: 15px;
+}
+
+.budget-toggle {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 15px;
+    color: var(--text-primary);
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
 }
 
-.modal.active {
+.budget-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.budget-toggle .toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.budget-toggle.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+/* Budget Display */
+.budget-display {
+    max-height: 500px;
+    opacity: 1;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.budget-display.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+}
+
+/* Cart item styles */
+#completedList .list-item {
+    background: var(--surface-dim);
+    border-color: rgba(0,0,0,0.04);
+}
+
+#completedList .list-item:hover {
+    background: var(--surface);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+#completedList .quantity-display {
+    min-width: 46px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.045);
+    color: var(--text-primary);
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    letter-spacing: 0.2px;
+}
+
+/* Cart heading styles */
+h3[data-type="completed"] {
     display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1em;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    color: #0a0a0a;
 }
 
-.modal-content {
-    background: white;
+h3[data-type="completed"] .count {
+    background: rgba(108, 92, 231, 0.15);
+    color: #6c5ce7;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+/* Empty state styles */
+.empty-state {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin: 10px 0;
+}
+
+/* Completed item styles */
+#completedList .list-item {
+    opacity: 0.8;
+    background: var(--surface-dim);
+}
+
+#completedList .list-item:hover {
+    opacity: 1;
+}
+
+/* Cart item styles */
+#completedList .list-item {
+    background: var(--surface-dim);
+    border-color: rgba(0,0,0,0.04);
+}
+
+#completedList .list-item:hover {
+    background: var(--surface);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+#completedList .quantity-display {
+    min-width: 46px;
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.045);
+    color: var(--text-primary);
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+}
+
+/* Cart heading styles */
+h3[data-type="completed"] {
+    display: flex;;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1em;
+}
+
+h3[data-type="completed"] .count {
+    background: rgba(108, 92, 231, 0.1);
+    /*color: #1e1e1f;*/
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.9em;
+}
+
+/* Empty state styles */
+.empty-state {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin: 10px 0;
+}
+
+/* Regular quantity display */
+.quantity-display {
+    min-width: 46px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.045);
+    color: var(--text-primary);
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    letter-spacing: 0.2px;
+}
+
+#activeList,
+#completedList {
+    padding: 0 8px;
+}
+
+/* Section titles */
+
+h3,.list-section h3 {
+    color: var(--text-primary);
+    margin: 1rem 0;
+    padding-left: 16px;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 390px) {
+    .container {
+        padding: 0 16px;
+    }
+
+    #activeList,
+    #completedList {
+        padding: 0 6px;
+    }
+
+    .list-item {
+        padding: 10px;
+        margin: 4px 0;
+    }
+
+    .item-details {
+        gap: 6px;
+    }
+
+    .quantity-display {
+        padding: 3px 6px;
+        font-size: 0.85rem;
+    }
+
+    .product-name {
+        font-size: 0.9rem;
+    }
+
+    .product-price {
+        padding: 3px 6px;
+        font-size: 0.85rem;
+    }
+
+    h3[data-type="completed"],
+    .list-section h3 {
+        padding-left: 14px;
+        font-size: 1rem;
+    }
+}
+
+/* Vorratsverwaltung Formular */
+#inventoryPage .inventory-form {
+    background: var(--surface);
     padding: 20px;
     border-radius: 12px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 16px 8px 24px 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
 }
 
-.modal h3 {
-    margin-bottom: 20px;
-    font-size: 18px;
-    color: #333;
+#inventoryPage .form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
-/* Scan Area Styles */
-.scan-area {
-    aspect-ratio: 1;
-    background: #f5f5f5;
+#inventoryPage .form-row .input-field {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: var(--background-secondary);
+}
+
+#inventoryPage .form-row .input-field:focus {
+    border-color: var(--button-accent);
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+    background: var(--background-primary);
+}
+
+#inventoryPage .form-row select.input-field {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+#inventoryPage .inventory-add-button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--button-accent), #1976d2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+
+#inventoryPage .inventory-add-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+#inventoryPage .inventory-add-button:active {
+    transform: translateY(1px);
+}
+
+#inventoryPage .list-item {
+    background: var(--background-secondary);
+    border-radius: 12px;
+    margin: 12px 8px;
+    padding: 16px;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color);
+}
+
+#inventoryPage .list-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+#inventoryPage .item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+#inventoryPage .item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#inventoryPage .item-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+#inventoryPage .item-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+#inventoryPage .expiry-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    background: var(--background-primary);
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+}
+
+#inventoryPage .delete-button {
+    padding: 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+}
+
+#inventoryPage .delete-button:hover {
+    opacity: 1;
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+}
+
+/* Mobile Anpassungen für Vorratsverwaltung */
+@media (max-width: 480px) {
+    #inventoryPage .inventory-form {
+        margin: 12px 4px 20px 4px;
+        padding: 16px;
+    }
+
+    #inventoryPage .form-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    #inventoryPage .form-row .input-field {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+    }
+    
+    #inventoryPage .inventory-add-button {
+        padding: 16px;
+        font-size: 1.1rem;
+        margin-top: 12px;
+    }
+
+    #inventoryPage .list-item {
+        margin: 8px 4px;
+        padding: 14px;
+    }
+
+    #inventoryPage .item-content {
+        gap: 12px;
+    }
+
+    #inventoryPage .item-info {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}
+
+/* Vorratsverwaltung - Menge und Einheit */
+#inventoryPage .quantity-unit-row {
+    display: flex;
+    gap: 12px;
+}
+
+#inventoryPage .quantity-unit-group {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+}
+
+#inventoryPage .quantity-unit-group .input-field[type="number"] {
+    width: 100px;
+    flex: none;
+}
+
+#inventoryPage .quantity-unit-group select.input-field {
+    width: 120px;
+    flex: none;
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 480px) {
+    #inventoryPage .quantity-unit-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #inventoryPage .quantity-unit-group {
+        width: 100%;
+    }
+
+    #inventoryPage .quantity-unit-group .input-field[type="number"],
+    #inventoryPage .quantity-unit-group select.input-field {
+        flex: 1;
+        width: auto;
+    }
+}
+
+/* Vorratsverwaltung - Professionelles Design */
+#inventoryPage .toggle-form-button {
+    display: none;
+    width: calc(100% - 24px);
+    margin: 12px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--button-accent), #1976d2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+#inventoryPage .inventory-form {
+    background: var(--surface);
+    padding: 24px;
+    border-radius: 16px;
+    margin: 16px 12px 24px 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+#inventoryPage .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+#inventoryPage .form-row .input-field {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 0px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: var(--background-secondary);
+    color: var(--text-primary);
+}
+
+#inventoryPage .form-row .input-field:hover {
+    border-color: rgba(33, 150, 243, 0.3);
+}
+
+#inventoryPage .form-row .input-field:focus {
+    border-color: var(--button-accent);
+    background: var(--background-primary);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+    transform: scale(1.02);
+}
+
+#inventoryPage .form-row select.input-field {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 18px;
+    padding-right: 48px;
+}
+
+#inventoryPage .quantity-unit-row {
+    display: flex;
+    gap: 16px;
+}
+
+#inventoryPage .quantity-unit-group {
+    display: flex;
+    gap: 8px;
+    width: auto;
+    flex: 0 1 auto;
+}
+
+#inventoryPage .quantity-unit-group .input-field[type="number"] {
+    width: 80px;
+    flex: none;
+}
+
+#inventoryPage .quantity-unit-group select.input-field {
+    width: 100px;
+    flex: none;
+}
+
+#inventoryPage .quantity-unit-row select#itemLocation {
+    width: 180px;
+    flex: none;
+}
+
+#inventoryPage .form-row input[type="date"] {
+    width: 180px;
+    flex: none;
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 480px) {
+    #inventoryPage .form-row:first-child .input-field {
+        width: 100%;
+    }
+
+    #inventoryPage .quantity-unit-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    #inventoryPage .quantity-unit-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    #inventoryPage .quantity-unit-group .input-field[type="number"] {
+        width: 45%;
+    }
+
+    #inventoryPage .quantity-unit-group select.input-field {
+        width: 45%;
+    }
+
+    #inventoryPage .quantity-unit-row select#itemLocation {
+        width: 100%;
+    }
+
+    #inventoryPage .form-row input[type="date"] {
+        width: 100%;
+    }
+}
+
+/* Vorratsverwaltung - Einheitliche Feldbreiten */
+#inventoryPage .form-row .input-field {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background: var(--background-secondary);
+    color: var(--text-primary);
+}
+
+#inventoryPage .form-row:first-child .input-field {
+    width: 180px;
+    flex: none;
+}
+
+#inventoryPage .quantity-unit-row {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-start;
+}
+
+#inventoryPage .quantity-unit-group {
+    display: flex;
+    gap: 8px;
+    width: auto;
+    flex: 0 1 auto;
+}
+
+#inventoryPage .quantity-unit-group .input-field[type="number"] {
+    width: 80px;
+    flex: none;
+}
+
+#inventoryPage .quantity-unit-group select.input-field {
+    width: 100px;
+    flex: none;
+}
+
+#inventoryPage .quantity-unit-row select#itemLocation {
+    width: 180px;
+    flex: none;
+}
+
+#inventoryPage .form-row input[type="date"] {
+    width: 180px;
+    flex: none;
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 480px) {
+    #inventoryPage .form-row:first-child .input-field,
+    #inventoryPage .quantity-unit-row select#itemLocation,
+    #inventoryPage .form-row input[type="date"] {
+        width: 100%;
+    }
+
+    #inventoryPage .quantity-unit-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    #inventoryPage .quantity-unit-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    #inventoryPage .quantity-unit-group .input-field[type="number"] {
+        width: 45%;
+    }
+
+    #inventoryPage .quantity-unit-group select.input-field {
+        width: 45%;
+    }
+}
+
+/* Vorratsverwaltung - Mobile-optimiertes Design */
+#inventoryPage .toggle-form-button {
+    display: none;
+    width: 100%;
+    margin: 0 0 12px 0;
+    padding: 14px;
+    background: var(--button-accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#inventoryPage .inventory-form {
+    background: var(--surface);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+#inventoryPage .form-group {
+    margin-bottom: 16px;
+}
+
+#inventoryPage .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+#inventoryPage .form-row-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+#inventoryPage .form-group.half {
+    flex: 1;
+    min-width: 0;
+}
+
+#inventoryPage .input-field {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--background-secondary);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+#inventoryPage .input-field:hover {
+    border-color: rgba(33, 150, 243, 0.3);
+}
+
+#inventoryPage .input-field:focus {
+    border-color: var(--button-accent);
+    background: var(--background-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+#inventoryPage select.input-field {
+    cursor: pointer;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+#inventoryPage .form-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+#inventoryPage .inventory-add-button,
+#inventoryPage .inventory-cancel-button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#inventoryPage .inventory-add-button {
+    background: var(--button-accent);
+    color: white;
+    border: none;
+}
+
+#inventoryPage .inventory-cancel-button {
+    background: var(--background-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+#inventoryPage .inventory-add-button:hover {
+    background: var(--accent-hover);
+}
+
+#inventoryPage .inventory-cancel-button:hover {
+    background: var(--background-primary);
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 480px) {
+    #inventoryPage .toggle-form-button {
+        display: block;
+    }
+
+    #inventoryPage .inventory-form {
+        margin: 0;
+        padding: 16px;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+    #inventoryPage .inventory-form.collapsed {
+        padding: 0;
+        margin: 0;
+    }
+
+    #inventoryPage .inventory-form:not(.collapsed) {
+        max-height: 600px;
+        opacity: 1;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    #inventoryPage .form-group {
+        margin-bottom: 12px;
+    }
+
+    #inventoryPage .form-row-group {
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    #inventoryPage .input-field {
+        padding: 10px;
+    }
+
+    #inventoryPage .form-actions {
+        margin-top: 20px;
+    }
+}
+
+/* Vorratsverwaltung - Cooles Design mit Effekten */
+#inventoryPage .toggle-form-button {
+    display: none;
+    width: 100%;
+    margin: 0 0 12px 0;
+    padding: 14px;
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+#inventoryPage .toggle-form-button:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: translateX(-100%);
+}
+
+#inventoryPage .toggle-form-button:hover:after {
+    transform: translateX(100%);
+    transition: transform 0.6s ease;
+}
+
+#inventoryPage .toggle-form-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(33, 150, 243, 0.3);
+}
+
+#inventoryPage .inventory-form {
+    background: var(--surface);
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+    transform-origin: top;
+}
+
+#inventoryPage .form-group {
     margin-bottom: 20px;
     position: relative;
     overflow: hidden;
 }
 
-.scan-frame {
-    position: absolute;
-    top: 10%;
-    left: 10%;
-    right: 10%;
-    bottom: 10%;
-    border: 2px solid #007AFF;
-    border-radius: 8px;
+#inventoryPage .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transform: translateY(0);
+    transition: transform 0.2s ease;
 }
 
-.scan-line {
+#inventoryPage .input-field {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    background: var(--background-secondary);
+    color: var(--text-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1);
+}
+
+#inventoryPage .input-field:hover {
+    border-color: rgba(33, 150, 243, 0.5);
+    transform: scale(1.01);
+}
+
+#inventoryPage .input-field:focus {
+    border-color: #2196f3;
+    background: var(--background-primary);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.15);
+    transform: scale(1.02);
+}
+
+#inventoryPage .form-row-group {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+#inventoryPage .form-group.half {
+    flex: 1;
+    min-width: 0;
+}
+
+#inventoryPage select.input-field {
+    cursor: pointer;
+    padding-right: 40px;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 18px;
+}
+
+#inventoryPage .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+#inventoryPage .inventory-add-button,
+#inventoryPage .inventory-cancel-button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+#inventoryPage .inventory-add-button {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+
+#inventoryPage .inventory-cancel-button {
+    background: var(--background-secondary);
+    color: var(--text-secondary);
+    border: 2px solid var(--border-color);
+}
+
+#inventoryPage .inventory-add-button:after,
+#inventoryPage .inventory-cancel-button:after {
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    height: 2px;
-    background: #007AFF;
-    animation: scan 2s linear infinite;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: translateX(-100%);
 }
 
-@keyframes scan {
-    0% { top: 0; }
-    100% { top: 100%; }
+#inventoryPage .inventory-add-button:hover:after,
+#inventoryPage .inventory-cancel-button:hover:after {
+    transform: translateX(100%);
+    transition: transform 0.6s ease;
 }
 
-/* Form Styles */
-#addItemForm {
+#inventoryPage .inventory-add-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(33, 150, 243, 0.3);
+}
+
+#inventoryPage .inventory-cancel-button:hover {
+    background: var(--background-primary);
+    border-color: #2196f3;
+}
+
+/* Animierte Formular Ein-/Ausblendung */
+@keyframes formSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes formSlideUp {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.98);
+    }
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 480px) {
+    #inventoryPage .toggle-form-button {
+        display: block;
+    }
+
+    #inventoryPage .inventory-form {
+        margin: 0;
+        padding: 16px;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        border: none;
+        box-shadow: none;
+        transform: translateY(-20px);
+    }
+
+    #inventoryPage .inventory-form.collapsed {
+        padding: 0;
+        margin: 0;
+    }
+
+    #inventoryPage .inventory-form:not(.collapsed) {
+        max-height: 800px;
+        opacity: 1;
+        padding: 20px;
+        margin-bottom: 20px;
+        transform: translateY(0);
+        animation: formSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    #inventoryPage .inventory-form.collapsed {
+        animation: formSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #inventoryPage .form-group {
+        margin-bottom: 16px;
+    }
+
+    #inventoryPage .form-row-group {
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    #inventoryPage .input-field {
+        padding: 12px;
+    }
+
+    #inventoryPage .form-actions {
+        margin-top: 24px;
+    }
+}
+
+/* Vorratsverwaltung - Neues Design */
+#inventoryPage .inventory-form {
+    max-width: 400px;
+    background-color: #fff;
+    padding: 20px 24px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #212121;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.084), 0px 2px 3px rgba(0, 0, 0, 0.168);
+    margin: 0 auto 24px auto;
 }
 
-#addItemForm select,
-#addItemForm input {
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
+#inventoryPage .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
-#addItemForm button {
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    background: #007AFF;
-    color: white;
-    font-size: 16px;
+#inventoryPage .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #212121;
+    font-weight: 500;
+}
+
+#inventoryPage .input-field {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-family: inherit;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: #212121;
+    font-size: 14px;
+}
+
+#inventoryPage .input-field::placeholder {
+    opacity: 0.5;
+}
+
+#inventoryPage .input-field:focus {
+    outline: none;
+    border-color: #1778f2;
+}
+
+#inventoryPage .form-row-group {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 0;
+}
+
+#inventoryPage .form-group.half {
+    flex: 1;
+    min-width: 0;
+}
+
+#inventoryPage select.input-field {
     cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23212121' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
 }
 
-#addItemForm button.close-button {
-    background: #f5f5f5;
-    color: #333;
+#inventoryPage .toggle-form-button {
+    max-width: 400px;
+    margin: 0 auto 16px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: inherit;
+    color: #fff;
+    background-color: #212121;
+    border: none;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: inherit;
+    gap: 8px;
+    cursor: pointer;
+    border-radius: 6px;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.084), 0px 2px 3px rgba(0, 0, 0, 0.168);
+    transition: all 0.2s ease;
 }
 
-/* Status Colors */
-.status-fresh {
-    color: #4CAF50;
+#inventoryPage .toggle-form-button:hover {
+    background-color: #313131;
 }
 
-.status-warning {
-    color: #FFC107;
+#inventoryPage .toggle-form-button:active {
+    transform: scale(0.95);
 }
 
-.status-expired {
-    color: #FF5722;
+#inventoryPage .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
 }
 
+#inventoryPage .inventory-add-button,
+#inventoryPage .inventory-cancel-button {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: inherit;
+    padding: 12px 16px;
+    font-size: inherit;
+    gap: 8px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+#inventoryPage .inventory-add-button {
+    color: #fff;
+    background-color: #212121;
+    border: none;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.084), 0px 2px 3px rgba(0, 0, 0, 0.168);
+}
+
+#inventoryPage .inventory-cancel-button {
+    color: #212121;
+    background-color: transparent;
+    border: 1px solid #ccc;
+}
+
+#inventoryPage .inventory-add-button:hover {
+    background-color: #313131;
+}
+
+#inventoryPage .inventory-cancel-button:hover {
+    background-color: #f5f5f5;
+}
+
+#inventoryPage .inventory-add-button:active,
+#inventoryPage .inventory-cancel-button:active {
+    transform: scale(0.95);
+}
+
+/* Mobile Anpassungen */
 @media (max-width: 480px) {
-    .container {
-        padding: 8px;
+    #inventoryPage .inventory-form {
+        margin: 0 12px 24px 12px;
+        padding: 24px 20px;
     }
-    
-    .section {
-        border-radius: 8px;
+
+    #inventoryPage .toggle-form-button {
+        margin: 0 12px 16px 12px;
     }
+
+    #inventoryPage .form-row-group {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    #inventoryPage .input-field {
+        padding: 10px 14px;
+    }
+
+    #inventoryPage .form-actions {
+        flex-direction: column;
+    }
+}
+
+/* Vorratsverwaltung - Kompakteres Design */
+#inventoryPage .inventory-form {
+    max-width: 360px;
+    background-color: #fff;
+    padding: 16px;
+    font-size: 13px;
+    font-family: inherit;
+    color: #212121;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.084), 0px 2px 3px rgba(0, 0, 0, 0.168);
+    margin: 0 auto 16px auto;
+}
+
+#inventoryPage .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-bottom: 0;
+}
+
+#inventoryPage .form-group label {
+    display: block;
+    margin-bottom: 1px;
+    color: #212121;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+#inventoryPage .input-field {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-family: inherit;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: #212121;
+    font-size: 13px;
+    height: 32px;
+}
+
+#inventoryPage .form-row-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 0;
+}
+
+#inventoryPage select.input-field {
+    max-width: 360px;
+    padding-right: 28px;
+    background-position: right 6px center;
+    background-size: 12px;
+}
+
+#inventoryPage .toggle-form-button {
+    max-width: 360px;
+    margin: 0 auto 12px auto;
+    padding: 8px 12px;
+    font-size: 13px;
+    height: 32px;
+}
+
+#inventoryPage .form-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+#inventoryPage .inventory-add-button,
+#inventoryPage .inventory-cancel-button {
+    padding: 6px 10px;
+    font-size: 13px;
+    height: 32px;
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 480px) {
+    #inventoryPage .inventory-form {
+        /* margin: 0 8px 16px 8px; */
+        padding: 12px;
+        gap: 8px;
+    }
+
+    #inventoryPage .toggle-form-button {
+        /* margin: 0 8px 12px 8px; */
+    }
+
+    #inventoryPage .form-row-group {
+        gap: 8px;
+    }
+
+    #inventoryPage .form-actions {
+        flex-direction: row;
+    }
+}
+
+/* Anpassung der Produktliste für bessere Sichtbarkeit */
+#inventoryList {
+    margin-top: 16px;
+    padding: 0 8px;
+}
+
+#inventoryPage .form-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: center;
+    align-items: stretch;
+    width: 100%;
+}
+
+#inventoryPage .inventory-add-button,
+#inventoryPage .inventory-cancel-button {
+    flex: 1;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    text-align: center;
+    line-height: 1;
+    box-sizing: border-box;
+    margin: 0;
+    border: 1px solid transparent;
+    width: 100%;
+    max-width: 160px;
+}
+
+#inventoryPage .inventory-add-button {
+    background-color: #212121;
+    color: #fff;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+#inventoryPage .inventory-cancel-button {
+    background-color: #f5f5f5;
+    color: #212121;
+    border-color: #e0e0e0;
+}
+
+#inventoryPage .inventory-add-button:hover {
+    background-color: #313131;
+    transform: translateY(-1px);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#inventoryPage .inventory-cancel-button:hover {
+    background-color: #eeeeee;
+    border-color: #d5d5d5;
+}
+
+#inventoryPage .inventory-add-button:active,
+#inventoryPage .inventory-cancel-button:active {
+    transform: translateY(1px);
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 480px) {
+    #inventoryPage .form-actions {
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    #inventoryPage .inventory-add-button,
+    #inventoryPage .inventory-cancel-button {
+        padding: 8px 12px;
+        height: 36px;
+    }
+}
+
+.inventory-list {
+    margin-top: 1rem;
+}
+
+.inventory-item {
+    background: var(--background-secondary);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.inventory-item-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.inventory-item-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.inventory-item-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.inventory-item-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.inventory-item-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.inventory-item-button {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.inventory-item-button:hover {
+    background: var(--background-hover);
+    color: var(--text-primary);
+}
+
+.mhd-warning {
+    color: #ff6b6b;
+}
+
+.mhd-expired {
+    color: #ff4444;
+    font-weight: 600;
 }
