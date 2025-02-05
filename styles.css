@@ -1546,7 +1546,6 @@ h3,.list-section h3 {
 
     #inventoryPage .quantity-unit-group {
         width: 100%;
-        justify-content: space-between;
     }
 
     #inventoryPage .quantity-unit-group .input-field[type="number"] {
@@ -2130,7 +2129,6 @@ h3,.list-section h3 {
 
     #inventoryPage .form-row-group {
         flex-direction: column;
-        gap: 20px;
     }
 
     #inventoryPage .input-field {
@@ -2495,6 +2493,346 @@ h3,.list-section h3 {
 @keyframes slideIn {
     from {
         transform: translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.inventory-notifications {
+    margin: 0.5rem 0;
+}
+
+.inventory-notification {
+    background-color: var(--background-secondary);
+    border-left: 4px solid #4CAF50;
+    color: var(--text-primary);
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideIn 0.3s ease-out;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.inventory-notification.error {
+    border-left-color: #ff4444;
+}
+
+.inventory-notification.success {
+    border-left-color: #4CAF50;
+}
+
+.inventory-notification.warning {
+    border-left-color: #ff9800;
+}
+
+.notification-container {
+    position: fixed;
+    bottom: 80px; /* Über dem Bottom-Menü */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none; /* Erlaubt Klicks durch den Container */
+}
+
+.notification {
+    background: var(--background-secondary);
+    color: var(--text-primary);
+    padding: 12px;
+    border-radius: 12px;
+    margin: 8px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideUp 0.3s ease-out;
+    width: 100%;
+    text-align: center;
+    pointer-events: auto; /* Macht die Benachrichtigung klickbar */
+}
+
+.notification.success {
+    border-left: 4px solid #4CAF50;
+}
+
+.notification.error {
+    border-left: 4px solid #ff4444;
+}
+
+.notification.warning {
+    border-left: 4px solid #ff9800;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.notification-container {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.notification {
+    background: var(--background-secondary);
+    color: var(--text-primary);
+    padding: 16px 24px;
+    border-radius: 16px;
+    margin: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideUp 0.3s ease-out;
+    width: 100%;
+    text-align: center;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.notification::before {
+    font-size: 1.2em;
+}
+
+.notification.success {
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.notification.success::before {
+    content: '✅';
+}
+
+.notification.error {
+    background: rgba(244, 67, 54, 0.15);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.notification.error::before {
+    content: '❌';
+}
+
+.notification.warning {
+    background: rgba(255, 152, 0, 0.15);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.notification.warning::before {
+    content: '⚠️';
+}
+
+.notification.info {
+    background: rgba(33, 150, 243, 0.15);
+    border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.notification.info::before {
+    content: 'ℹ️';
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.product-code-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.product-code-input .input-field {
+    flex: 1;
+}
+
+.scan-button {
+    background: var(--primary-color);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.scan-button:hover {
+    background: var(--primary-color-dark);
+}
+
+.scanner-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+}
+
+.scanner-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scanner-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--background-primary);
+}
+
+.scanner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: var(--background-secondary);
+}
+
+.scanner-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.close-scanner {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.viewport {
+    flex: 1;
+    position: relative;
+    background: #000;
+    overflow: hidden;
+}
+
+.viewport video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.viewport canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.scanner-footer {
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    background: var(--background-secondary);
+}
+
+.flash-button {
+    background: var(--primary-color);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.flash-button:hover {
+    background: var(--primary-color-dark);
+}
+
+.flash-button.active {
+    background: var(--accent-color);
+}
+
+.notification.add-to-list {
+    background: var(--background-secondary);
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease-out;
+}
+
+.add-to-list-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+.add-to-list-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.add-to-list-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.add-to-list-buttons button:first-child {
+    background: var(--primary-color);
+    color: var(--text-primary);
+}
+
+.add-to-list-buttons button:last-child {
+    background: var(--background-tertiary);
+    color: var(--text-primary);
+}
+
+.add-to-list-buttons button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(100%);
         opacity: 0;
     }
     to {

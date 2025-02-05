@@ -1,3 +1,186 @@
+// Barcode Scanner Funktionen
+let quaggaInstance = null;
+
+function openScanner() {
+    const modal = document.getElementById('scannerModal');
+    modal.classList.add('active');
+    
+    initQuagga();
+}
+
+function closeScanner() {
+    const modal = document.getElementById('scannerModal');
+    modal.classList.remove('active');
+    
+    if (quaggaInstance) {
+        Quagga.stop();
+        quaggaInstance = null;
+    }
+}
+
+function initQuagga() {
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: "#interactive",
+            constraints: {
+                facingMode: "environment"
+            },
+        },
+        decoder: {
+            readers: ["ean_reader", "ean_8_reader", "upc_reader", "upc_e_reader"]
+        }
+    }, function(err) {
+        if (err) {
+            console.error(err);
+            showNotification('Kamera konnte nicht initialisiert werden', 'error');
+            return;
+        }
+        quaggaInstance = true;
+        Quagga.start();
+    });
+
+    Quagga.onDetected(function(result) {
+        const code = result.codeResult.code;
+        document.getElementById('productCode').value = code;
+        
+        // Prüfen ob der Code bereits in der Datenbank existiert
+        checkProductCode(code);
+        
+        // Scanner schließen
+        closeScanner();
+    });
+}
+
+function toggleFlash() {
+    if (!quaggaInstance) return;
+    
+    const track = Quagga.CameraAccess.getActiveTrack();
+    if (track && track.getCapabilities().torch) {
+        const flashButton = document.querySelector('.flash-button');
+        const torchState = !flashButton.classList.contains('active');
+        
+        track.applyConstraints({
+            advanced: [{ torch: torchState }]
+        });
+        
+        flashButton.classList.toggle('active');
+    } else {
+        showNotification('Blitz wird nicht unterstützt', 'warning');
+    }
+}
+
+function checkProductCode(code) {
+    const inventoryRef = firebase.database().ref('inventory');
+    inventoryRef.orderByChild('productCode').equalTo(code).once('value')
+        .then((snapshot) => {
+            if (snapshot.exists()) {
+                const item = Object.values(snapshot.val())[0];
+                showNotification(`Produkt "${item.name}" gefunden!`, 'success');
+                
+                // Popup zum Hinzufügen zur Einkaufsliste anzeigen
+                showAddToShoppingListPopup(item);
+            }
+        })
+        .catch((error) => {
+            console.error('Error checking product code:', error);
+            showNotification('Fehler beim Prüfen des Produktcodes', 'error');
+        });
+}
+
+function showAddToShoppingListPopup(item) {
+    const popup = document.createElement('div');
+    popup.className = 'notification add-to-list';
+    popup.innerHTML = `
+        <div class="add-to-list-content">
+            <span>${item.name} zur Einkaufsliste hinzufügen?</span>
+            <div class="add-to-list-buttons">
+                <button onclick="addToShoppingList('${item.id}')">Ja</button>
+                <button onclick="this.parentElement.parentElement.parentElement.remove()">Nein</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(popup);
+    
+    // Popup nach 10 Sekunden automatisch ausblenden
+    setTimeout(() => {
+        if (popup.parentElement) {
+            popup.remove();
+        }
+    }, 10000);
+}
+
+function addToShoppingList(itemId) {
+    const inventoryRef = firebase.database().ref('inventory').child(itemId);
+    inventoryRef.once('value')
+        .then((snapshot) => {
+            const item = snapshot.val();
+            if (item) {
+                const productInput = document.getElementById('productInput');
+                productInput.value = `${item.quantity}${item.unit} ${item.name}`;
+                addProduct(); // Vorhandene Funktion zum Hinzufügen zur Einkaufsliste
+                
+                // Zur Einkaufsliste wechseln
+                switchPage('shoppingListPage', document.querySelector('.nav-item'));
+            }
+        })
+        .catch((error) => {
+            console.error('Error adding to shopping list:', error);
+            showNotification('Fehler beim Hinzufügen zur Einkaufsliste', 'error');
+        });
+}
+
+// Bestehende Funktionen aktualisieren
+
+function addInventoryItem() {
+    const name = document.getElementById('inventoryInput').value;
+    const quantity = document.getElementById('itemQuantity').value;
+    const unit = document.getElementById('itemUnit').value;
+    const mhd = document.getElementById('itemMhd').value;
+    const location = document.getElementById('itemLocation').value;
+    const productCode = document.getElementById('productCode').value;
+
+    if (!name || !quantity || !mhd || !location) {
+        showNotification('Bitte füllen Sie alle Pflichtfelder aus', 'error');
+        return;
+    }
+
+    const item = {
+        id: Date.now(),
+        name,
+        quantity: parseFloat(quantity),
+        unit,
+        mhd,
+        location,
+        productCode,
+        createdAt: new Date().toISOString()
+    };
+
+    saveInventoryItem(item)
+        .then(() => {
+            showNotification(`${name} wurde hinzugefügt`, 'success');
+            clearInventoryForm();
+            toggleInventoryForm();
+        })
+        .catch(error => {
+            console.error('Error saving item:', error);
+            showNotification('Fehler beim Speichern des Artikels', 'error');
+        });
+}
+
+function clearInventoryForm() {
+    document.getElementById('inventoryInput').value = '';
+    document.getElementById('itemQuantity').value = '';
+    document.getElementById('itemUnit').value = 'stk';
+    document.getElementById('itemMhd').value = '';
+    document.getElementById('itemLocation').value = '';
+    document.getElementById('productCode').value = '';
+    editingItemId = null;
+    updateSubmitButton();
+}
+
 const firebaseConfig = {
     apiKey: "AIzaSyB6FaJir2q31UF9BbXCLfSEl-2LxxJBO3U",
     authDomain: "magnetkuechencenter.firebaseapp.com",
@@ -486,24 +669,100 @@ function switchPage(pageId, navItem) {
     }
 }
 
-// Firebase Inventory Management Functions
+// Benachrichtigungsfunktion
+function showNotification(message, type = 'info') {
+    let container = document.getElementById('notificationContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'notificationContainer';
+        container.className = 'notification-container';
+        document.body.insertBefore(container, document.querySelector('.bottom-nav'));
+    }
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+
+    // Automatisch nach oben scrollen wenn neue Benachrichtigung hinzugefügt wird
+    if (container.children.length > 0) {
+        container.insertBefore(notification, container.firstChild);
+    } else {
+        container.appendChild(notification);
+    }
+
+    // Benachrichtigung nach 3 Sekunden ausblenden
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+            notification.remove();
+            if (container.children.length === 0) {
+                container.remove();
+            }
+        }, 300);
+    }, 3000);
+}
+
+let editingItemId = null;
+
 function toggleInventoryForm() {
     const form = document.querySelector('.inventory-form');
+    const toggleButton = document.getElementById('toggleFormButton');
     form.classList.toggle('collapsed');
     
-    // Formular zurücksetzen beim Schließen
+    // Button-Text ändern
     if (form.classList.contains('collapsed')) {
+        toggleButton.innerHTML = '➕ Neuer Artikel';
+        // Formular zurücksetzen beim Schließen
         clearInventoryForm();
+    } else {
+        toggleButton.innerHTML = '✖️ Schließen';
     }
 }
 
-function initializeFirebaseInventory() {
+function handleInventorySubmit() {
+    if (editingItemId) {
+        updateInventoryItem();
+    } else {
+        addInventoryItem();
+    }
+}
+
+function updateInventoryItem() {
+    const name = document.getElementById('inventoryInput').value;
+    const quantity = document.getElementById('itemQuantity').value;
+    const unit = document.getElementById('itemUnit').value;
+    const mhd = document.getElementById('itemMhd').value;
+    const location = document.getElementById('itemLocation').value;
+
+    if (!name || !quantity || !mhd || !location) {
+        showNotification('Bitte füllen Sie alle Pflichtfelder aus', 'error');
+        return;
+    }
+
+    const item = {
+        id: editingItemId,
+        name,
+        quantity: parseFloat(quantity),
+        unit,
+        mhd,
+        location,
+        updatedAt: new Date().toISOString()
+    };
+
     const inventoryRef = firebase.database().ref('inventory');
-    
-    // Listen for changes in the inventory
-    inventoryRef.on('value', (snapshot) => {
-        renderInventoryList(snapshot.val() || {});
-    });
+    inventoryRef.child(editingItemId).update(item)
+        .then(() => {
+            showNotification(`${name} wurde aktualisiert`, 'success');
+            clearInventoryForm();
+            toggleInventoryForm();
+            editingItemId = null;
+            updateSubmitButton();
+        })
+        .catch(error => {
+            console.error('Error updating item:', error);
+            showNotification('Fehler beim Aktualisieren des Artikels', 'error');
+        });
 }
 
 function addInventoryItem() {
@@ -512,9 +771,10 @@ function addInventoryItem() {
     const unit = document.getElementById('itemUnit').value;
     const mhd = document.getElementById('itemMhd').value;
     const location = document.getElementById('itemLocation').value;
+    const productCode = document.getElementById('productCode').value;
 
     if (!name || !quantity || !mhd || !location) {
-        showInventoryError('Bitte füllen Sie alle Pflichtfelder aus');
+        showNotification('Bitte füllen Sie alle Pflichtfelder aus', 'error');
         return;
     }
 
@@ -525,21 +785,144 @@ function addInventoryItem() {
         unit,
         mhd,
         location,
+        productCode,
         createdAt: new Date().toISOString()
     };
 
-    saveInventoryItem(item);
-    clearInventoryForm();
-    toggleInventoryForm(); // Formular nach erfolgreichem Hinzufügen schließen
+    saveInventoryItem(item)
+        .then(() => {
+            showNotification(`${name} wurde hinzugefügt`, 'success');
+            clearInventoryForm();
+            toggleInventoryForm();
+        })
+        .catch(error => {
+            console.error('Error saving item:', error);
+            showNotification('Fehler beim Speichern des Artikels', 'error');
+        });
+}
+
+function editInventoryItem(id) {
+    const inventoryRef = firebase.database().ref('inventory').child(id);
+    inventoryRef.once('value')
+        .then(snapshot => {
+            const item = snapshot.val();
+            if (!item) {
+                showNotification('Artikel nicht gefunden', 'error');
+                return;
+            }
+
+            editingItemId = id;
+            document.getElementById('inventoryInput').value = item.name;
+            document.getElementById('itemQuantity').value = item.quantity;
+            document.getElementById('itemUnit').value = item.unit;
+            document.getElementById('itemMhd').value = item.mhd;
+            document.getElementById('itemLocation').value = item.location;
+
+            // Formular öffnen und Button-Text aktualisieren
+            const form = document.querySelector('.inventory-form');
+            form.classList.remove('collapsed');
+            updateSubmitButton();
+            
+            // Toggle-Button Text aktualisieren
+            const toggleButton = document.getElementById('toggleFormButton');
+            toggleButton.innerHTML = '✖️ Schließen';
+        })
+        .catch(error => {
+            console.error('Error editing item:', error);
+            showNotification('Fehler beim Laden des Artikels', 'error');
+        });
+}
+
+function updateSubmitButton() {
+    const submitButton = document.getElementById('submitButton');
+    if (editingItemId) {
+        submitButton.innerHTML = '<i class="fas fa-save"></i><span>Speichern</span>';
+    } else {
+        submitButton.innerHTML = '<i class="fas fa-plus"></i><span>Artikel hinzufügen</span>';
+    }
+}
+
+function clearInventoryForm() {
+    document.getElementById('inventoryInput').value = '';
+    document.getElementById('itemQuantity').value = '';
+    document.getElementById('itemUnit').value = 'stk';
+    document.getElementById('itemMhd').value = '';
+    document.getElementById('itemLocation').value = '';
+    document.getElementById('productCode').value = '';
+    editingItemId = null;
+    updateSubmitButton();
 }
 
 function saveInventoryItem(item) {
     const inventoryRef = firebase.database().ref('inventory');
-    inventoryRef.child(item.id).set(item)
+    return inventoryRef.child(item.id).set(item);
+}
+
+function deleteInventoryItem(id, showNotif = true) {
+    const inventoryRef = firebase.database().ref('inventory').child(id);
+    
+    inventoryRef.once('value')
+        .then(snapshot => {
+            const item = snapshot.val();
+            return inventoryRef.remove()
+                .then(() => {
+                    if (showNotif && item) {
+                        showNotification(`${item.name} wurde gelöscht`, 'success');
+                    }
+                });
+        })
         .catch(error => {
-            console.error('Error saving item:', error);
-            showInventoryError('Fehler beim Speichern des Artikels');
+            console.error('Error deleting item:', error);
+            if (showNotif) {
+                showNotification('Fehler beim Löschen des Artikels', 'error');
+            }
         });
+}
+
+// Überprüfung der ablaufenden Produkte
+function checkExpiringProducts() {
+    const inventoryRef = firebase.database().ref('inventory');
+    try {
+        inventoryRef.once('value')
+            .then(snapshot => {
+                const inventory = snapshot.val() || {};
+                const today = new Date();
+                
+                Object.values(inventory).forEach(item => {
+                    const mhdDate = new Date(item.mhd);
+                    const daysUntilExpiry = Math.ceil((mhdDate - today) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysUntilExpiry <= 0) {
+                        showNotification(`${item.name} ist abgelaufen!`, 'error');
+                    } else if (daysUntilExpiry <= 3) {
+                        showNotification(`${item.name} läuft in ${daysUntilExpiry} Tagen ab!`, 'warning');
+                    }
+                });
+            });
+    } catch (error) {
+        console.error('Fehler bei der Überprüfung der ablaufenden Produkte:', error);
+    }
+}
+
+// Initialisierung
+document.addEventListener('DOMContentLoaded', () => {
+    initializeFirebaseInventory();
+    
+    // Überprüfe die Produkte alle 12 Stunden
+    setInterval(checkExpiringProducts, 12 * 60 * 60 * 1000);
+    
+    // Überprüfe die Produkte sofort beim Laden
+    checkExpiringProducts();
+});
+
+// Firebase Inventory Management Functions
+function initializeFirebaseInventory() {
+    const inventoryRef = firebase.database().ref('inventory');
+    
+    // Listen for changes in the inventory
+    inventoryRef.on('value', (snapshot) => {
+        renderInventoryList(snapshot.val() || {});
+    });
 }
 
 function getInventory(callback) {
@@ -553,14 +936,6 @@ function getInventory(callback) {
             console.error('Error getting inventory:', error);
             callback([]);
         });
-}
-
-function clearInventoryForm() {
-    document.getElementById('inventoryInput').value = '';
-    document.getElementById('itemQuantity').value = '';
-    document.getElementById('itemMhd').value = '';
-    document.getElementById('itemLocation').value = '';
-    document.getElementById('itemUnit').selectedIndex = 0;
 }
 
 function renderInventoryList(inventoryData) {
@@ -635,227 +1010,6 @@ function getMhdStatus(days) {
     }
     return '';
 }
-
-function editInventoryItem(id) {
-    const inventoryRef = firebase.database().ref('inventory').child(id);
-    inventoryRef.once('value')
-        .then(snapshot => {
-            const item = snapshot.val();
-            if (!item) return;
-
-            document.getElementById('inventoryInput').value = item.name;
-            document.getElementById('itemQuantity').value = item.quantity;
-            document.getElementById('itemUnit').value = item.unit;
-            document.getElementById('itemMhd').value = item.mhd;
-            document.getElementById('itemLocation').value = item.location;
-
-            // Show the form
-            const form = document.querySelector('.inventory-form');
-            form.classList.remove('collapsed');
-
-            // Delete the old item
-            deleteInventoryItem(id);
-        })
-        .catch(error => {
-            console.error('Error editing item:', error);
-            showInventoryError('Fehler beim Laden des Artikels');
-        });
-}
-
-function deleteInventoryItem(id) {
-    const inventoryRef = firebase.database().ref('inventory').child(id);
-    inventoryRef.remove()
-        .catch(error => {
-            console.error('Error deleting item:', error);
-            showInventoryError('Fehler beim Löschen des Artikels');
-        });
-}
-
-// Fehlermeldungsfunktion für Vorratsverwaltung
-function showInventoryError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'inventory-error';
-    errorDiv.textContent = message;
-
-    const form = document.querySelector('.inventory-form');
-    // Entferne vorherige Fehlermeldungen
-    const oldError = form.querySelector('.inventory-error');
-    if (oldError) {
-        oldError.remove();
-    }
-    
-    form.insertBefore(errorDiv, form.querySelector('.add-inventory-button'));
-
-    // Fehlermeldung nach 3 Sekunden ausblenden
-    setTimeout(() => {
-        errorDiv.remove();
-    }, 3000);
-}
-
-// Benachrichtigungsfunktionen für ablaufende Produkte
-function requestNotificationPermission() {
-    if (!("Notification" in window)) {
-        console.log("Dieser Browser unterstützt keine Benachrichtigungen");
-        return;
-    }
-
-    Notification.requestPermission().then(function(permission) {
-        if (permission === "granted") {
-            checkExpiringProducts();
-        }
-    });
-}
-
-let messaging;
-try {
-    messaging = firebase.messaging();
-    messaging.usePublicVapidKey('YOUR_VAPID_KEY'); // Hier Ihren VAPID-Key einfügen
-} catch (error) {
-    console.log('Push-Benachrichtigungen werden nicht unterstützt');
-}
-
-async function initializePushNotifications() {
-    if (!messaging) return;
-
-    try {
-        // Berechtigungen anfordern
-        const permission = await Notification.requestPermission();
-        if (permission !== 'granted') {
-            console.log('Benachrichtigungen wurden nicht erlaubt');
-            return;
-        }
-
-        // Token für Push-Benachrichtigungen erhalten
-        const token = await messaging.getToken();
-        if (token) {
-            // Token in Firebase speichern
-            const userId = 'user_' + Date.now(); // Hier sollten Sie eine richtige User-ID verwenden
-            await firebase.database().ref('userTokens/' + userId).set(token);
-        }
-
-        // Token-Aktualisierungen überwachen
-        messaging.onTokenRefresh(async () => {
-            const refreshedToken = await messaging.getToken();
-            await firebase.database().ref('userTokens/' + userId).set(refreshedToken);
-        });
-
-        // Nachrichtenhandling im Vordergrund
-        messaging.onMessage((payload) => {
-            console.log('Nachricht empfangen:', payload);
-            showExpiryNotification(payload.data.item, payload.data.timeframe);
-        });
-
-    } catch (error) {
-        console.error('Fehler bei der Push-Benachrichtigung-Initialisierung:', error);
-    }
-}
-
-async function checkExpiringProducts() {
-    const inventoryRef = firebase.database().ref('inventory');
-    try {
-        const snapshot = await inventoryRef.once('value');
-        const inventory = snapshot.val() || {};
-        const today = new Date();
-        const notifiedItems = JSON.parse(localStorage.getItem('notifiedItems') || '{}');
-        
-        for (const item of Object.values(inventory)) {
-            const mhdDate = new Date(item.mhd);
-            const daysUntilExpiry = Math.ceil((mhdDate - today) / (1000 * 60 * 60 * 24));
-            
-            const lastNotified = notifiedItems[item.id] || 0;
-            const lastNotifiedDate = new Date(lastNotified).toDateString();
-            const todayString = today.toDateString();
-
-            if (lastNotifiedDate !== todayString) {
-                let timeframe = null;
-                if (daysUntilExpiry < 0) timeframe = 'abgelaufen';
-                else if (daysUntilExpiry === 0) timeframe = 'heute';
-                else if (daysUntilExpiry === 1) timeframe = 'morgen';
-                else if (daysUntilExpiry <= 3) timeframe = '3 Tage';
-                else if (daysUntilExpiry <= 7) timeframe = '7 Tage';
-
-                if (timeframe) {
-                    // Lokale Benachrichtigung
-                    showExpiryNotification(item, timeframe);
-
-                    // Push-Benachrichtigung senden
-                    if (messaging) {
-                        const message = {
-                            data: {
-                                item: JSON.stringify(item),
-                                timeframe: timeframe
-                            },
-                            topic: 'expiring-products'
-                        };
-
-                        try {
-                            await firebase.database().ref('notifications').push(message);
-                        } catch (error) {
-                            console.error('Fehler beim Senden der Push-Benachrichtigung:', error);
-                        }
-                    }
-
-                    // Update der letzten Benachrichtigung
-                    notifiedItems[item.id] = today.getTime();
-                    localStorage.setItem('notifiedItems', JSON.stringify(notifiedItems));
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Fehler bei der Überprüfung der ablaufenden Produkte:', error);
-    }
-}
-
-function showExpiryNotification(item, timeframe) {
-    if (Notification.permission === "granted") {
-        let title, body;
-        
-        switch(timeframe) {
-            case 'abgelaufen':
-                title = '⚠️ Produkt abgelaufen!';
-                body = `${item.name} ist abgelaufen.`;
-                break;
-            case 'heute':
-                title = '⚠️ Produkt läuft heute ab!';
-                body = `${item.name} läuft heute ab.`;
-                break;
-            case 'morgen':
-                title = '⚡ Produkt läuft morgen ab!';
-                body = `${item.name} läuft morgen ab.`;
-                break;
-            case '3 Tage':
-                title = '📅 Produkt läuft bald ab!';
-                body = `${item.name} läuft in weniger als 3 Tagen ab.`;
-                break;
-            case '7 Tage':
-                title = '📅 Produkt läuft bald ab!';
-                body = `${item.name} läuft in weniger als 7 Tagen ab.`;
-                break;
-        }
-
-        const notification = new Notification(title, {
-            body: body + `\nLagerort: ${item.location}`,
-            icon: '/icon.png'
-        });
-
-        notification.onclick = function() {
-            window.focus();
-            document.querySelector('#inventoryPage').scrollIntoView();
-        };
-    }
-}
-
-// Initialize Firebase and inventory list on page load
-document.addEventListener('DOMContentLoaded', async () => {
-    initializeFirebaseInventory();
-    await initializePushNotifications();
-    
-    // Überprüfe die Produkte alle 12 Stunden
-    setInterval(checkExpiringProducts, 12 * 60 * 60 * 1000);
-    
-    // Überprüfe die Produkte sofort beim Laden
-    checkExpiringProducts();
-});
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {

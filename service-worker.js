@@ -1,58 +1,39 @@
-// Service Worker für Push-Benachrichtigungen
-self.addEventListener('push', function(event) {
-    if (event.data) {
-        const data = event.data.json();
-        const options = {
-            body: data.body,
-            icon: '/icon.png',
-            badge: '/badge.png',
-            vibrate: [100, 50, 100],
-            data: {
-                url: data.url
-            }
-        };
-
-        event.waitUntil(
-            self.registration.showNotification(data.title, options)
-        );
-    }
-});
-
-self.addEventListener('notificationclick', function(event) {
-    event.notification.close();
-    event.waitUntil(
-        clients.openWindow(event.notification.data.url)
-    );
-});
-
-// Cache-Strategie für Offline-Funktionalität
-const CACHE_NAME = 'vorratsliste-v1';
-const urlsToCache = [
+const CACHE_NAME = 'einkaufsliste-v1';
+const ASSETS = [
     '/',
     '/index.html',
     '/styles.css',
     '/script.js',
-    '/icon.png',
-    '/badge.png'
+    '/manifest.json',
+    '/icon.png'
 ];
 
-self.addEventListener('install', function(event) {
+// Cache-Installation
+self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(function(cache) {
-                return cache.addAll(urlsToCache);
-            })
+            .then((cache) => cache.addAll(ASSETS))
     );
 });
 
-self.addEventListener('fetch', function(event) {
+// Cache-Aktivierung und alte Caches löschen
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames
+                    .filter((name) => name !== CACHE_NAME)
+                    .map((name) => caches.delete(name))
+            );
+        })
+    );
+});
+
+// Fetch-Handler für Offline-Funktionalität
+self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request)
-            .then(function(response) {
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request);
-            })
+            .then((response) => response || fetch(event.request))
+            .catch(() => caches.match('/'))
     );
 });
