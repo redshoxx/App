@@ -457,13 +457,12 @@ input, textarea {
 }
 
 .scan-button {
-    position: absolute;
-    top: -28px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: auto;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 56px;
     height: 56px;
-    border-radius: 28px;
+    border-radius: 50%;
     background-color: var(--accent-color);
     color: white;
     border: none;
@@ -473,9 +472,9 @@ input, textarea {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 0 24px;
     transition: all 0.3s ease;
     z-index: 1001;
+    padding: 0;
 }
 
 .scan-button i {
@@ -484,17 +483,17 @@ input, textarea {
 }
 
 .scan-button span {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 500;
 }
 
 .scan-button:hover {
-    transform: translateX(-50%) scale(1.05);
+    transform: scale(1.1);
     background-color: var(--accent-color-dark);
 }
 
 .scan-button:active {
-    transform: translateX(-50%) scale(0.95);
+    transform: scale(0.95);
 }
 
 /* Page Switching */
@@ -2875,11 +2874,22 @@ h3,.list-section h3 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
     transition: all 0.3s ease;
-    z-index: 1000;
+    z-index: 1001;
+    padding: 0;
+}
+
+#inventoryPage .scan-button i {
+    font-size: 24px;
+    margin-bottom: 2px;
+}
+
+#inventoryPage .scan-button span {
+    font-size: 10px;
+    font-weight: 500;
 }
 
 #inventoryPage .scan-button:hover {
@@ -2889,8 +2899,4 @@ h3,.list-section h3 {
 
 #inventoryPage .scan-button:active {
     transform: scale(0.95);
-}
-
-#inventoryPage .scan-button i {
-    font-size: 24px;
 }
