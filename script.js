@@ -78,15 +78,33 @@ function checkProductCode(code) {
             if (snapshot.exists()) {
                 const item = Object.values(snapshot.val())[0];
                 showNotification(`Produkt "${item.name}" gefunden!`, 'success');
-                
-                // Popup zum Hinzufügen zur Einkaufsliste anzeigen
                 showAddToShoppingListPopup(item);
+            } else {
+                // Wenn das Produkt nicht gefunden wurde, öffnen wir das Formular zum Hinzufügen
+                showNotification('Neues Produkt - Bitte Details eingeben', 'info');
+                openAddProductForm(code);
             }
         })
         .catch((error) => {
             console.error('Error checking product code:', error);
             showNotification('Fehler beim Prüfen des Produktcodes', 'error');
         });
+}
+
+function openAddProductForm(code) {
+    // Formular öffnen
+    const form = document.querySelector('.inventory-form');
+    form.classList.remove('collapsed');
+    
+    // Barcode in das Formular eintragen
+    document.getElementById('productCode').value = code;
+    
+    // Toggle-Button Text aktualisieren
+    const toggleButton = document.getElementById('toggleFormButton');
+    toggleButton.innerHTML = '✖️ Schließen';
+    
+    // Fokus auf das Namensfeld setzen
+    document.getElementById('inventoryInput').focus();
 }
 
 function showAddToShoppingListPopup(item) {

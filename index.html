@@ -64,87 +64,38 @@
         </div>
 
         <div id="inventoryPage" class="page">
-            <h3 class="list-section">📦 Vorratsverwaltung</h3>
-            <button class="toggle-form-button" onclick="toggleInventoryForm()" id="toggleFormButton">
-                ➕ Neuer Artikel
-            </button>
+            <div class="inventory-header">
+                <h2>Vorratsverwaltung</h2>
+                <button id="toggleFormButton" onclick="toggleInventoryForm()">
+                    <i class="fas fa-plus"></i><span>Artikel hinzufügen</span>
+                </button>
+            </div>
+            
             <div class="inventory-form collapsed">
-                <div class="form-group">
-                    <label for="inventoryInput">Artikel</label>
-                    <input type="text" 
-                           id="inventoryInput"
-                           class="input-field"
-                           placeholder="z.B. Milch"
-                           autocomplete="off"
-                           enterkeyhint="next">
+                <input type="text" id="inventoryInput" placeholder="Artikelname" required>
+                <div class="form-row">
+                    <input type="number" id="itemQuantity" placeholder="Menge" required>
+                    <select id="itemUnit" required>
+                        <option value="stk">Stück</option>
+                        <option value="g">Gramm</option>
+                        <option value="kg">Kilogramm</option>
+                        <option value="ml">Milliliter</option>
+                        <option value="l">Liter</option>
+                        <option value="pkg">Packung</option>
+                    </select>
                 </div>
-                
-                <div class="form-group">
-                    <label for="productCode">Produktcode</label>
-                    <div class="product-code-input">
-                        <input type="text" 
-                               id="productCode"
-                               class="input-field"
-                               placeholder="Barcode eingeben oder scannen"
-                               readonly>
-                        <button type="button" class="scan-button" onclick="openScanner()">
-                            <i class="fas fa-barcode"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="form-row-group">
-                    <div class="form-group half">
-                        <label for="itemQuantity">Menge</label>
-                        <input type="number" 
-                               id="itemQuantity" 
-                               class="input-field" 
-                               placeholder="1"
-                               min="0" 
-                               step="0.1">
-                    </div>
-                    <div class="form-group half">
-                        <label for="itemUnit">Einheit</label>
-                        <select id="itemUnit" class="input-field">
-                            <option value="stk">Stück</option>
-                            <option value="g">Gramm</option>
-                            <option value="kg">Kilogramm</option>
-                            <option value="ml">Milliliter</option>
-                            <option value="l">Liter</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row-group">
-                    <div class="form-group half">
-                        <label for="itemMhd">MHD</label>
-                        <input type="date" 
-                               id="itemMhd" 
-                               class="input-field date-input"
-                               pattern="\d{4}-\d{2}-\d{2}"
-                               required
-                               placeholder="TT.MM.JJJJ">
-                    </div>
-                    <div class="form-group half">
-                        <label for="itemLocation">Lagerort</label>
-                        <select id="itemLocation" class="input-field">
-                            <option value="">Bitte wählen...</option>
-                            <option value="Kühlschrank">🧊 Kühlschrank</option>
-                            <option value="Tiefkühler">❄️ Tiefkühler</option>
-                            <option value="Abstellkammer">🏠 Abstellkammer</option>
-                            <option value="Keller">🏚️ Keller</option>
-                            <option value="Küche">🍳 Küche</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button onclick="handleInventorySubmit()" class="add-inventory-button" id="submitButton">
-                    <i class="fas fa-plus"></i>
-                    <span>Artikel hinzufügen</span>
+                <input type="date" id="itemMhd" required>
+                <input type="text" id="itemLocation" placeholder="Lagerort" required>
+                <input type="text" id="productCode" placeholder="Barcode (optional)" readonly>
+                <button id="submitButton" onclick="handleInventorySubmit()">
+                    <i class="fas fa-plus"></i><span>Artikel hinzufügen</span>
                 </button>
             </div>
 
-            <div id="inventoryList" class="inventory-list"></div>
+            <div id="inventoryList"></div>
+
+            <!-- Scan-Button -->
+            
         </div>
     </div>
 
@@ -170,15 +121,20 @@
         </div>
     </div>
 
+    <button class="scan-button" onclick="openScanner()">
+        <i class="fas fa-barcode"></i>
+        <span>Scan</span>
+    </button>
+
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchPage('shoppingListPage', this)">
-            <span class="nav-icon">🛍️</span>
-            <span class="nav-text">Einkaufsliste</span>
-        </div>
-        <div class="nav-item" onclick="switchPage('inventoryPage', this)">
-            <span class="nav-icon">📦</span>
-            <span class="nav-text">Vorräte</span>
-        </div>
+        <a href="#" class="nav-item" onclick="switchPage('shoppingListPage', this)">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Einkaufsliste</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchPage('inventoryPage', this)">
+            <i class="fas fa-box"></i>
+            <span>Vorräte</span>
+        </a>
     </nav>
 
     <script src="script.js"></script>
