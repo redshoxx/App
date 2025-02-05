@@ -2392,3 +2392,113 @@ h3,.list-section h3 {
     color: #ff4444;
     font-weight: 600;
 }
+
+.date-input {
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.8rem;
+    width: 100%;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+    background-color: var(--text-secondary);
+    padding: 0.2rem;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.date-input::-webkit-datetime-edit {
+    padding: 0;
+}
+
+.date-input::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+/* Für Firefox */
+.date-input::-moz-calendar-picker-indicator {
+    background-color: var(--text-secondary);
+}
+
+.add-inventory-button {
+    width: 100%;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.add-inventory-button:hover {
+    background: linear-gradient(135deg, #45a049, #3d8b40);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.add-inventory-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.add-inventory-button i {
+    font-size: 1.2rem;
+}
+
+/* Responsives Design für mobile Geräte */
+@media (max-width: 768px) {
+    .date-input {
+        font-size: 16px; /* Verhindert Zoom auf iOS */
+        padding: 0.6rem;
+    }
+
+    .add-inventory-button {
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+
+    .form-row-group {
+        flex-direction: column;
+    }
+
+    .form-group.half {
+        width: 100%;
+    }
+}
+
+.inventory-error {
+    background-color: #ff4444;
+    color: white;
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    text-align: center;
+    font-weight: 500;
+    animation: slideIn 0.3s ease-out;
+    box-shadow: 0 2px 4px rgba(255, 68, 68, 0.2);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

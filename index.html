@@ -105,7 +105,10 @@
                         <label for="itemMhd">MHD</label>
                         <input type="date" 
                                id="itemMhd" 
-                               class="input-field">
+                               class="input-field date-input"
+                               pattern="\d{4}-\d{2}-\d{2}"
+                               required
+                               placeholder="TT.MM.JJJJ">
                     </div>
                     <div class="form-group half">
                         <label for="itemLocation">Lagerort</label>
@@ -116,7 +119,10 @@
                     </div>
                 </div>
 
-                <button onclick="addInventoryItem()" class="add-button">Hinzufügen</button>
+                <button onclick="addInventoryItem()" class="add-inventory-button">
+                    <i class="fas fa-plus"></i>
+                    <span>Artikel hinzufügen</span>
+                </button>
             </div>
 
             <div id="inventoryList" class="inventory-list"></div>

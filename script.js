@@ -514,7 +514,7 @@ function addInventoryItem() {
     const location = document.getElementById('itemLocation').value;
 
     if (!name || !quantity || !mhd || !location) {
-        showError('Bitte füllen Sie alle Pflichtfelder aus');
+        showInventoryError('Bitte füllen Sie alle Pflichtfelder aus');
         return;
     }
 
@@ -530,6 +530,7 @@ function addInventoryItem() {
 
     saveInventoryItem(item);
     clearInventoryForm();
+    toggleInventoryForm(); // Formular nach erfolgreichem Hinzufügen schließen
 }
 
 function saveInventoryItem(item) {
@@ -537,7 +538,7 @@ function saveInventoryItem(item) {
     inventoryRef.child(item.id).set(item)
         .catch(error => {
             console.error('Error saving item:', error);
-            showError('Fehler beim Speichern des Artikels');
+            showInventoryError('Fehler beim Speichern des Artikels');
         });
 }
 
@@ -657,7 +658,7 @@ function editInventoryItem(id) {
         })
         .catch(error => {
             console.error('Error editing item:', error);
-            showError('Fehler beim Laden des Artikels');
+            showInventoryError('Fehler beim Laden des Artikels');
         });
 }
 
@@ -666,8 +667,29 @@ function deleteInventoryItem(id) {
     inventoryRef.remove()
         .catch(error => {
             console.error('Error deleting item:', error);
-            showError('Fehler beim Löschen des Artikels');
+            showInventoryError('Fehler beim Löschen des Artikels');
         });
+}
+
+// Fehlermeldungsfunktion für Vorratsverwaltung
+function showInventoryError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'inventory-error';
+    errorDiv.textContent = message;
+
+    const form = document.querySelector('.inventory-form');
+    // Entferne vorherige Fehlermeldungen
+    const oldError = form.querySelector('.inventory-error');
+    if (oldError) {
+        oldError.remove();
+    }
+    
+    form.insertBefore(errorDiv, form.querySelector('.add-inventory-button'));
+
+    // Fehlermeldung nach 3 Sekunden ausblenden
+    setTimeout(() => {
+        errorDiv.remove();
+    }, 3000);
 }
 
 // Benachrichtigungsfunktionen für ablaufende Produkte
