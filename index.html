@@ -14,38 +14,38 @@
 </head>
 <body>
     <h1 style="color: var(--text-primary); margin: 1rem 0; text-align: center;">🛍️ Einkaufsliste</h1>
-    <div class="budget-wrapper">
-        <button class="budget-toggle">
-            <span class="toggle-icon">▼</span>
-            Budget Details
-        </button>
-        <div class="budget-display">
-            <div class="budget-info">
-                <span>
-                    <div>Budget</div>
-                    <input type="number" 
-                           class="budget-edit" 
-                           id="budgetAmount" 
-                           value="0.00"
-                           step="0.01"
-                           onclick="this.select()"
-                           onblur="updateBudget(this.value)"
-                           onkeypress="if(event.key === 'Enter') this.blur()">
-                </span>
-                <span>
-                    <div>Gesamt</div>
-                    <div id="totalAmount">0.00</div>
-                </span>
-                <span>
-                    <div>Verbleibend</div>
-                    <div id="remainingAmount">0.00</div>
-                </span>
-            </div>
-        </div>
-    </div>
     
     <div class="container">
         <div id="shoppingListPage" class="page active">
+            <div class="budget-wrapper">
+                <button class="budget-toggle">
+                    <span class="toggle-icon">▼</span>
+                    Budget Details
+                </button>
+                <div class="budget-display">
+                    <div class="budget-info">
+                        <span>
+                            <div>Budget</div>
+                            <input type="number" 
+                                   class="budget-edit" 
+                                   id="budgetAmount" 
+                                   value="0.00"
+                                   step="0.01"
+                                   onclick="this.select()"
+                                   onblur="updateBudget(this.value)"
+                                   onkeypress="if(event.key === 'Enter') this.blur()">
+                        </span>
+                        <span>
+                            <div>Gesamt</div>
+                            <div id="totalAmount">0.00</div>
+                        </span>
+                        <span>
+                            <div>Verbleibend</div>
+                            <div id="remainingAmount">0.00</div>
+                        </span>
+                    </div>
+                </div>
+            </div>
             <input type="text" 
                    class="input-field"
                    id="productInput"
@@ -87,6 +87,9 @@
                                class="input-field"
                                placeholder="Barcode eingeben oder scannen"
                                readonly>
+                        <button type="button" class="scan-button" onclick="openScanner()">
+                            <i class="fas fa-barcode"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -108,7 +111,6 @@
                             <option value="kg">Kilogramm</option>
                             <option value="ml">Milliliter</option>
                             <option value="l">Liter</option>
-                            <option value="pkg">Packung</option>
                         </select>
                     </div>
                 </div>
@@ -144,6 +146,12 @@
 
             <div id="inventoryList" class="inventory-list"></div>
         </div>
+
+        <div id="recipesPage" class="page">
+            <div id="recipeList" class="recipe-list">
+                <!-- Rezepte werden hier dynamisch eingefügt -->
+            </div>
+        </div>
     </div>
 
     <div id="pricePopup" class="price-popup">
@@ -168,20 +176,19 @@
         </div>
     </div>
 
-    <button class="scan-button" onclick="openScanner()">
-        <i class="fas fa-barcode"></i>
-        <span>Scan</span>
-    </button>
-
     <nav class="bottom-nav">
-        <a href="#" class="nav-item" onclick="switchPage('shoppingListPage', this)">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Einkaufsliste</span>
-        </a>
-        <a href="#" class="nav-item" onclick="switchPage('inventoryPage', this)">
-            <i class="fas fa-box"></i>
-            <span>Vorräte</span>
-        </a>
+        <div class="nav-item active" onclick="switchPage('shoppingListPage', this)">
+            <span class="nav-icon">🛍️</span>
+            <span class="nav-text">Einkaufsliste</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('inventoryPage', this)">
+            <span class="nav-icon">📦</span>
+            <span class="nav-text">Vorräte</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('recipesPage', this)">
+            <span class="nav-icon">📝</span>
+            <span class="nav-text">Rezepte</span>
+        </div>
     </nav>
 
     <script src="script.js"></script>

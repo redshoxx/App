@@ -78,33 +78,15 @@ function checkProductCode(code) {
             if (snapshot.exists()) {
                 const item = Object.values(snapshot.val())[0];
                 showNotification(`Produkt "${item.name}" gefunden!`, 'success');
+                
+                // Popup zum Hinzufügen zur Einkaufsliste anzeigen
                 showAddToShoppingListPopup(item);
-            } else {
-                // Wenn das Produkt nicht gefunden wurde, öffnen wir das Formular zum Hinzufügen
-                showNotification('Neues Produkt - Bitte Details eingeben', 'info');
-                openAddProductForm(code);
             }
         })
         .catch((error) => {
             console.error('Error checking product code:', error);
             showNotification('Fehler beim Prüfen des Produktcodes', 'error');
         });
-}
-
-function openAddProductForm(code) {
-    // Formular öffnen
-    const form = document.querySelector('.inventory-form');
-    form.classList.remove('collapsed');
-    
-    // Barcode in das Formular eintragen
-    document.getElementById('productCode').value = code;
-    
-    // Toggle-Button Text aktualisieren
-    const toggleButton = document.getElementById('toggleFormButton');
-    toggleButton.innerHTML = '✖️ Schließen';
-    
-    // Fokus auf das Namensfeld setzen
-    document.getElementById('inventoryInput').focus();
 }
 
 function showAddToShoppingListPopup(item) {
@@ -708,7 +690,7 @@ function showNotification(message, type = 'info') {
         container.appendChild(notification);
     }
 
-    // Benachrichtigung nach 3 Sekunden ausblenden
+    // Benachrichtigung nach 3 Sekunden automatisch ausblenden
     setTimeout(() => {
         notification.style.opacity = '0';
         notification.style.transform = 'translateY(-10px)';
@@ -1078,3 +1060,450 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('budgetDisplayCollapsed', budgetDisplay.classList.contains('collapsed'));
     });
 });
+
+// Rezeptverwaltung
+function loadRecipes() {
+    const recipeList = document.getElementById('recipeList');
+    if (!recipeList) return;
+
+    database.ref('recipes').on('value', (snapshot) => {
+        recipeList.innerHTML = '';
+        const recipes = snapshot.val() || {};
+        
+        if (Object.keys(recipes).length === 0) {
+            recipeList.innerHTML = '<div class="empty-state">Keine Rezepte vorhanden</div>';
+            return;
+        }
+
+        Object.entries(recipes).forEach(([key, recipe]) => {
+            recipeList.appendChild(createRecipeElement(key, recipe));
+        });
+    });
+}
+
+function createRecipeElement(key, recipe) {
+    const div = document.createElement('div');
+    div.className = 'recipe-card';
+    
+    div.innerHTML = `
+        <div class="recipe-header">
+            <h3>${recipe.name}</h3>
+            <div class="recipe-actions">
+                <button onclick="addRecipeToShoppingList('${key}')" title="Alle Zutaten zur Einkaufsliste hinzufügen">
+                    <i class="fas fa-cart-plus"></i> Alle
+                </button>
+                <button onclick="deleteRecipe('${key}')" class="danger" title="Rezept löschen">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        <div class="recipe-meta">
+            <span class="recipe-tag">
+                <i class="fas fa-list"></i>
+                ${recipe.ingredients.length} Zutaten
+            </span>
+            ${recipe.price ? `
+            <span class="recipe-tag">
+                <i class="fas fa-euro-sign"></i>
+                ${recipe.price.toFixed(2)} €
+            </span>
+            ` : ''}
+        </div>
+        <div class="recipe-content">
+            <h4>Zutaten:</h4>
+            <div class="ingredient-grid">
+                ${recipe.ingredients.map((ingredient, index) => `
+                    <div class="ingredient-item">
+                        <div class="ingredient-details">
+                            <div class="ingredient-amount">
+                                <span class="amount">${ingredient.quantity}${ingredient.unit}</span>
+                            </div>
+                            <div class="ingredient-info">
+                                <span class="name">${ingredient.name}</span>
+                            </div>
+                        </div>
+                        <button onclick="addIngredientToShoppingList('${key}', ${index})" 
+                                class="add-to-cart-btn" 
+                                title="Zur Einkaufsliste hinzufügen">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+            ${recipe.instructions ? `
+                <div class="recipe-instructions">
+                    <h4>Zubereitung:</h4>
+                    <p>${recipe.instructions}</p>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    return div;
+}
+
+function addRecipeToShoppingList(recipeKey) {
+    database.ref('recipes/' + recipeKey).once('value')
+        .then(snapshot => {
+            const recipe = snapshot.val();
+            if (!recipe || !recipe.ingredients) {
+                showToast('Keine Zutaten im Rezept gefunden', 'error');
+                return;
+            }
+            
+            showToast('Füge Zutaten hinzu...', 'info');
+            
+            const items = recipe.ingredients.map(ingredient => ({
+                value: parseFloat(ingredient.quantity) || 1,
+                unit: ingredient.unit || 'x',
+                name: ingredient.name,
+                price: null,
+                category: 'rezept',
+                completed: false,
+                timestamp: Date.now()
+            }));
+            
+            const promises = items.map(item => 
+                database.ref('items').push(item)
+            );
+            
+            return Promise.all(promises);
+        })
+        .then(() => {
+            showToast('Zutaten zur Einkaufsliste hinzugefügt', 'success');
+            switchToPage('shoppingListPage');
+        })
+        .catch(error => {
+            console.error('Fehler beim Hinzufügen:', error);
+            showToast('Fehler beim Hinzufügen der Zutaten', 'error');
+        });
+}
+
+function addIngredientToShoppingList(recipeKey, ingredientIndex) {
+    database.ref('recipes/' + recipeKey).once('value')
+        .then(snapshot => {
+            const recipe = snapshot.val();
+            if (!recipe || !recipe.ingredients) {
+                throw new Error('Rezept oder Zutat nicht gefunden');
+            }
+            
+            const ingredient = recipe.ingredients[ingredientIndex];
+            if (!ingredient) {
+                throw new Error('Zutat nicht gefunden');
+            }
+            
+            return database.ref('items').push({
+                value: parseFloat(ingredient.quantity) || 1,
+                unit: ingredient.unit || 'x',
+                name: ingredient.name,
+                price: null,
+                category: 'rezept',
+                completed: false,
+                timestamp: Date.now()
+            });
+        })
+        .then(() => {
+            showToast('Zutat zur Einkaufsliste hinzugefügt', 'success');
+        })
+        .catch(error => {
+            console.error('Fehler:', error);
+            showToast(error.message, 'error');
+        });
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    // Animation einblenden
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Nach 3 Sekunden ausblenden
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Formular-Steuerung
+function toggleRecipeForm() {
+    const form = document.querySelector('.recipe-form');
+    if (!form) return;
+    
+    const isCollapsed = form.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+        form.style.display = 'block';
+        setTimeout(() => form.classList.remove('collapsed'), 10);
+        document.getElementById('recipeName')?.focus();
+    } else {
+        form.classList.add('collapsed');
+        setTimeout(() => form.style.display = 'none', 300);
+        resetRecipeForm();
+    }
+}
+
+function addIngredientField() {
+    const list = document.getElementById('ingredientsList');
+    if (!list) return;
+    
+    const div = document.createElement('div');
+    div.className = 'ingredient-entry';
+    
+    div.innerHTML = `
+        <div class="ingredient-form">
+            <div class="ingredient-header">
+                <h4><i class="fas fa-carrot"></i> Neue Zutat</h4>
+                <button type="button" class="close-ingredient" onclick="removeIngredientField(this)" title="Entfernen">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="ingredient-inputs">
+                <div class="quantity-unit-container">
+                    <div class="input-group quantity-group">
+                        <label><i class="fas fa-balance-scale"></i> Menge</label>
+                        <input type="number" 
+                               class="quantity-input input-field" 
+                               placeholder="0" 
+                               min="0" 
+                               step="0.1"
+                               inputmode="decimal"
+                               required>
+                    </div>
+                    <div class="input-group unit-group">
+                        <label><i class="fas fa-ruler"></i> Einheit</label>
+                        <select class="unit-input input-field" required>
+                            <option value="">Wählen</option>
+                            <option value="x">Stück</option>
+                            <option value="g">Gramm</option>
+                            <option value="kg">Kilogramm</option>
+                            <option value="ml">Milliliter</option>
+                            <option value="l">Liter</option>
+                            <option value="EL">Esslöffel</option>
+                            <option value="TL">Teelöffel</option>
+                            <option value="Prise">Prise</option>
+                            <option value="Packung">Packung</option>
+                            <option value="Dose">Dose</option>
+                            <option value="Bund">Bund</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-group name-group">
+                    <label><i class="fas fa-shopping-basket"></i> Produkt</label>
+                    <input type="text" 
+                           class="name-input input-field" 
+                           placeholder="z.B. Tomaten"
+                           autocomplete="off"
+                           required>
+                </div>
+                <div class="input-group price-group">
+                    <label><i class="fas fa-tag"></i> Preis (€)</label>
+                    <div class="price-input-group">
+                        <input type="number" 
+                               class="price-input input-field" 
+                               placeholder="0.00" 
+                               min="0" 
+                               step="0.01"
+                               inputmode="decimal">
+                        <span class="currency-symbol">€</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Event-Listener für Validierung und Mobile-Optimierung
+    const inputs = div.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        input.addEventListener('input', validateRecipeForm);
+        input.addEventListener('change', validateRecipeForm);
+        
+        // Mobile Scrolling
+        input.addEventListener('focus', () => {
+            if (window.innerWidth <= 428) {
+                setTimeout(() => {
+                    input.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }, 300);
+            }
+        });
+    });
+    
+    list.appendChild(div);
+    div.querySelector('.quantity-input')?.focus();
+    validateRecipeForm();
+}
+
+function removeIngredientField(button) {
+    const entry = button.closest('.ingredient-entry');
+    if (!entry) return;
+    
+    entry.classList.add('fade-out');
+    setTimeout(() => {
+        entry.remove();
+        validateRecipeForm();
+    }, 300);
+}
+
+function validateRecipeForm() {
+    const name = document.getElementById('recipeName')?.value.trim() || '';
+    const ingredients = document.querySelectorAll('.ingredient-entry');
+    const saveButton = document.querySelector('.save-recipe-btn');
+    
+    let isValid = true;
+    
+    // Überprüfe Rezeptname
+    if (!name) {
+        isValid = false;
+    }
+    
+    // Überprüfe Zutaten
+    if (ingredients.length === 0) {
+        isValid = false;
+    } else {
+        ingredients.forEach(entry => {
+            const quantity = entry.querySelector('.quantity-input')?.value;
+            const unit = entry.querySelector('.unit-input')?.value;
+            const name = entry.querySelector('.name-input')?.value.trim();
+            
+            if (!quantity || !unit || !name) {
+                isValid = false;
+            }
+        });
+    }
+    
+    if (saveButton) {
+        saveButton.disabled = !isValid;
+    }
+    
+    return isValid;
+}
+
+function saveRecipe() {
+    if (!validateRecipeForm()) {
+        showToast('Bitte fülle alle erforderlichen Felder aus', 'error');
+        return;
+    }
+    
+    const name = document.getElementById('recipeName').value.trim();
+    const instructions = document.getElementById('recipeInstructions')?.value.trim() || '';
+    const ingredientEntries = document.querySelectorAll('.ingredient-entry');
+    
+    try {
+        const ingredients = Array.from(ingredientEntries).map(entry => {
+            const quantity = entry.querySelector('.quantity-input').value;
+            const unit = entry.querySelector('.unit-input').value;
+            const name = entry.querySelector('.name-input').value.trim();
+            const price = entry.querySelector('.price-input').value;
+            
+            return {
+                quantity: parseFloat(quantity),
+                unit: unit,
+                name: name,
+                price: price ? parseFloat(price) : null
+            };
+        });
+        
+        // Berechne den Gesamtpreis
+        const totalPrice = ingredients.reduce((sum, ingredient) => {
+            return sum + (ingredient.price || 0);
+        }, 0);
+        
+        const recipe = {
+            name,
+            ingredients,
+            instructions,
+            totalPrice,
+            timestamp: Date.now()
+        };
+        
+        // Speichere in Firebase
+        database.ref('recipes').push(recipe)
+            .then(() => {
+                showToast('Rezept erfolgreich gespeichert', 'success');
+                toggleRecipeForm();
+            })
+            .catch(error => {
+                console.error('Fehler beim Speichern:', error);
+                showToast('Fehler beim Speichern des Rezepts', 'error');
+            });
+            
+    } catch (error) {
+        console.error('Fehler beim Verarbeiten des Rezepts:', error);
+        showToast('Fehler beim Verarbeiten des Rezepts', 'error');
+    }
+}
+
+function resetRecipeForm() {
+    try {
+        const form = document.querySelector('.recipe-form');
+        if (!form) return;
+        
+        // Setze Hauptfelder zurück
+        const nameInput = form.querySelector('#recipeName');
+        const instructionsInput = form.querySelector('#recipeInstructions');
+        const ingredientsList = form.querySelector('#ingredientsList');
+        const saveButton = form.querySelector('.save-recipe-btn');
+        
+        if (nameInput) nameInput.value = '';
+        if (instructionsInput) instructionsInput.value = '';
+        if (ingredientsList) ingredientsList.innerHTML = '';
+        if (saveButton) saveButton.disabled = true;
+        
+    } catch (error) {
+        console.error('Fehler beim Zurücksetzen des Formulars:', error);
+    }
+}
+
+// Event-Listener für die Formularvalidierung
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const recipeForm = document.querySelector('.recipe-form');
+        if (!recipeForm) return;
+        
+        // Validierung bei Eingabe und Änderungen
+        recipeForm.addEventListener('input', validateRecipeForm);
+        recipeForm.addEventListener('change', validateRecipeForm);
+        
+        // Verhindern des Formular-Submits bei Enter
+        recipeForm.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter' && event.target.tagName !== 'TEXTAREA') {
+                event.preventDefault();
+            }
+        });
+        
+        // Initialer Validierungsstatus
+        validateRecipeForm();
+        
+    } catch (error) {
+        console.error('Fehler beim Initialisieren der Formularvalidierung:', error);
+    }
+});
+
+// Hilfsfunktion für Toast-Nachrichten
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <div class="toast-content">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Animation
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    });
+}
