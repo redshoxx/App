@@ -2,8 +2,10 @@ const CACHE_NAME = 'einkaufsliste-v1';
 const ASSETS = [
     '/',
     '/index.html',
+    '/todo.html',
     '/styles.css',
     '/script.js',
+    '/todo.js',
     '/manifest.json',
     '/icon.png'
 ];
