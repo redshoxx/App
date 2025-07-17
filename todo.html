@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📝 To Do Liste</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1 style="color: var(--text-primary); margin: 1rem 0; text-align: center;">📝 To Do Liste</h1>
+    <div class="container">
+        <input type="text" id="todoInput" class="input-field" placeholder="Neue Aufgabe" autocomplete="off" enterkeyhint="done">
+        <button id="addTodo" class="add-button">Hinzufügen</button>
+        <ul id="todoList" class="todo-list"></ul>
+    </div>
+    <script src="todo.js"></script>
+</body>
+</html>
