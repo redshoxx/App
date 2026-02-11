@@ -1,39 +1,22 @@
-const CACHE_NAME = 'einkaufsliste-v1';
+const CACHE_NAME = 'tetris-mobile-v1';
 const ASSETS = [
-    '/',
-    '/index.html',
-    '/styles.css',
-    '/script.js',
-    '/manifest.json',
-    '/icon.png'
+  '/',
+  '/index.html',
+  '/styles.css',
+  '/script.js',
+  '/manifest.json'
 ];
 
-// Cache-Installation
 self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => cache.addAll(ASSETS))
-    );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)));
 });
 
-// Cache-Aktivierung und alte Caches löschen
 self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames
-                    .filter((name) => name !== CACHE_NAME)
-                    .map((name) => caches.delete(name))
-            );
-        })
-    );
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
+  );
 });
 
-// Fetch-Handler für Offline-Funktionalität
 self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request)
-            .then((response) => response || fetch(event.request))
-            .catch(() => caches.match('/'))
-    );
+  event.respondWith(caches.match(event.request).then((res) => res || fetch(event.request)));
 });
